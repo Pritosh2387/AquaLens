@@ -1,0 +1,435 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+:root {
+  /* Primary Environment - Deep Oceanic Abyss */
+  --color-abyssal-black: #020611;
+  --color-abyssal-950: #030712;
+  --color-abyssal-900: #040a17;
+  --color-abyssal-850: #071224;
+  --color-abyssal-800: #0a1931;
+  --color-abyssal-750: #0e2444;
+  --color-abyssal-700: #13315c;
+  --color-abyssal-600: #1d437a;
+
+  /* Intelligence Accents - Deep Royal Ocean & Sky Blue Palette */
+  --color-blue-glow: #38bdf8;
+  --color-blue-bright: #60a5fa;
+  --color-blue-primary: #2563eb;
+  --color-blue-deep: #1d4ed8;
+  --color-blue-dark: #1e40af;
+  --color-blue-sky: #0284c7;
+
+  /* Oil Spill & Heat Hazard Accents */
+  --color-spill-amber: #f59e0b;
+  --color-spill-orange: #ea580c;
+  --color-spill-dark: #b45309;
+  --color-spill-brown: #78350f;
+
+  /* Restrained Critical & Healthy */
+  --color-critical-red: #ef4444;
+  --color-critical-dark: #991b1b;
+  --color-healthy-teal: #10b981;
+  --color-healthy-dark: #065f46;
+
+  /* Data Provenance Standards */
+  --color-prov-mock: #94a3b8;
+  --color-prov-observed: #38bdf8;
+  --color-prov-inferred: #818cf8;
+  --color-prov-simulated: #f59e0b;
+  --color-prov-feedback: #10b981;
+
+  /* Crystalline Surface Specifications */
+  --crystalline-panel-bg: rgba(6, 15, 34, 0.85);
+  --crystalline-panel-hover: rgba(10, 25, 55, 0.92);
+  --crystalline-panel-header: rgba(11, 28, 60, 0.9);
+  --crystalline-border: rgba(37, 99, 235, 0.28);
+  --crystalline-border-hover: rgba(56, 189, 248, 0.55);
+  --crystalline-border-active: rgba(56, 189, 248, 0.8);
+  --crystalline-inner-highlight: rgba(255, 255, 255, 0.05);
+  --crystalline-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.75);
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  
+  html, body, #root {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: var(--color-abyssal-black);
+    color: #e2e8f0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow-x: hidden;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-feature-settings: 'tnum' on, 'zero' on;
+  }
+
+  /* Monospace Tabular Numerals for Mission Telemetry */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Crystalline Instrumentation Surfaces & Enhanced Animations
+   ───────────────────────────────────────────────────────────────────────────── */
+.crystalline-panel {
+  background: var(--crystalline-panel-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--crystalline-border);
+  box-shadow: var(--crystalline-shadow), inset 0 1px 0 0 var(--crystalline-inner-highlight);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.crystalline-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.85), transparent);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.7);
+  pointer-events: none;
+}
+
+.crystalline-interactive {
+  cursor: pointer;
+}
+
+.crystalline-interactive:hover {
+  border-color: var(--crystalline-border-hover);
+  background: var(--crystalline-panel-hover);
+  box-shadow: 0 12px 36px 0 rgba(0, 0, 0, 0.8), 0 0 24px -2px rgba(56, 189, 248, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.crystalline-panel-active {
+  border-color: var(--crystalline-border-active);
+  box-shadow: 0 0 32px -2px rgba(56, 189, 248, 0.6), inset 0 1px 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.crystalline-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+/* Mission Control Instrument Label */
+.instrument-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+/* Mission Control Value */
+.instrument-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Nautical Grid Background */
+.nautical-grid {
+  background-image: 
+    linear-gradient(to right, rgba(56, 189, 248, 0.22) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(56, 189, 248, 0.22) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Fine Coordinate Sub-grid */
+.nautical-grid-fine {
+  background-image: 
+    linear-gradient(to right, rgba(56, 189, 248, 0.14) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(56, 189, 248, 0.14) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* Atmospheric Ocean Gradient with Subtle Dynamic Shift */
+.ocean-atmosphere {
+  background: radial-gradient(ellipse at 50% 15%, rgba(14, 55, 115, 0.55) 0%, rgba(3, 7, 18, 0.92) 60%, rgba(2, 6, 17, 1) 100%);
+}
+
+/* Bathymetric Depth Glow */
+.bathymetric-glow {
+  background: radial-gradient(circle at 50% 40%, rgba(56, 189, 248, 0.18) 0%, rgba(2, 6, 17, 0) 75%);
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   VIBRANT MARITIME ANIMATIONS — SKY BLUE ACCENTS
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* 1. Fast & Energetic Radar Sweep */
+@keyframes radar-sweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.radar-sweep-line {
+  animation: radar-sweep 3.2s linear infinite;
+  transform-origin: center center;
+  filter: drop-shadow(0 0 10px #38bdf8);
+}
+
+.radar-sweep-fast {
+  animation: radar-sweep 2.0s linear infinite;
+  transform-origin: center center;
+  filter: drop-shadow(0 0 12px #38bdf8);
+}
+
+/* 2. Pulsing Ocean Glow for Highlights & Active Cards */
+@keyframes blue-pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 18px rgba(56, 189, 248, 0.4), inset 0 0 12px rgba(56, 189, 248, 0.25);
+    border-color: rgba(56, 189, 248, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 32px rgba(56, 189, 248, 0.8), inset 0 0 22px rgba(125, 211, 252, 0.45);
+    border-color: rgba(125, 211, 252, 0.95);
+  }
+}
+
+.animate-ocean-glow {
+  animation: blue-pulse-glow 2.2s ease-in-out infinite;
+}
+
+/* 3. Dynamic Animated Wave Background */
+@keyframes ocean-wave-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animated-wave-bg {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(14, 116, 144, 0.35), rgba(30, 58, 138, 0.5), rgba(7, 16, 33, 0.95));
+  background-size: 200% 200%;
+  animation: ocean-wave-shift 7s ease infinite;
+}
+
+/* 4. Scanning Volumetric Laser Beam */
+@keyframes scanline-sweep {
+  0% { top: 0%; opacity: 0.95; }
+  50% { opacity: 0.45; }
+  100% { top: 100%; opacity: 0.95; }
+}
+
+/* 6. High-Visibility Underwater Sonar Grid & Laser Wave Background Animations */
+@keyframes underwater-sonar-pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.85;
+    border-color: rgba(56, 189, 248, 0.9);
+    box-shadow: 0 0 24px rgba(56, 189, 248, 0.6);
+  }
+  50% {
+    opacity: 0.5;
+    border-color: rgba(125, 211, 252, 0.7);
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+    border-color: rgba(56, 189, 248, 0);
+    box-shadow: 0 0 60px rgba(56, 189, 248, 0);
+  }
+}
+
+.sonar-pulse-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid rgba(56, 189, 248, 0.8);
+  animation: underwater-sonar-pulse 4s cubic-bezier(0.1, 0.7, 0.1, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes underwater-grid-drift {
+  0% { background-position: 0px 0px; }
+  100% { background-position: 40px 40px; }
+}
+
+.underwater-laser-grid {
+  background-image: 
+    linear-gradient(to right, rgba(56, 189, 248, 0.18) 1.5px, transparent 1.5px),
+    linear-gradient(to bottom, rgba(56, 189, 248, 0.18) 1.5px, transparent 1.5px);
+  background-size: 40px 40px;
+  animation: underwater-grid-drift 10s linear infinite;
+}
+
+@keyframes vibrant-aurora-wave {
+  0% {
+    background-position: 0% 0%;
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    background-position: 100% 100%;
+    filter: hue-rotate(15deg);
+  }
+  100% {
+    background-position: 0% 0%;
+    filter: hue-rotate(0deg);
+  }
+}
+
+.vibrant-aurora-bg {
+  background: radial-gradient(circle at 30% 20%, rgba(14, 116, 144, 0.45) 0%, transparent 60%),
+              radial-gradient(circle at 80% 70%, rgba(30, 58, 138, 0.6) 0%, transparent 65%),
+              radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.25) 0%, transparent 70%);
+  background-size: 180% 180%;
+  animation: vibrant-aurora-wave 12s ease-in-out infinite;
+}
+
+/* 5. Beacon Pulsing Indicator */
+@keyframes beacon-ping {
+  0% { transform: scale(0.95); opacity: 0.9; box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.85); }
+  70% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 0 14px rgba(56, 189, 248, 0); }
+  100% { transform: scale(0.95); opacity: 0.9; box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+}
+
+.animate-beacon {
+  animation: beacon-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Custom Maritime Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #040915;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #11284d;
+  border-radius: 3px;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #1d4ed8;
+  border-color: rgba(56, 189, 248, 0.6);
+}
+
+/* Leaflet Dark Customization */
+.leaflet-container {
+  background: #040915 !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.leaflet-control-zoom {
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+  border-radius: 6px !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.8) !important;
+}
+
+.leaflet-control-zoom a {
+  background-color: rgba(7, 16, 33, 0.92) !important;
+  color: #38bdf8 !important;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.2) !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: rgba(6, 15, 34, 0.96) !important;
+  backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(56, 189, 248, 0.4) !important;
+  color: #e2e8f0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.85) !important;
+}
+
+.leaflet-popup-tip {
+  background: rgba(6, 15, 34, 0.96) !important;
+  border: 1px solid rgba(56, 189, 248, 0.4) !important;
+}
+
+.leaflet-popup-close-button {
+  color: #94a3b8 !important;
+}
+
+/* ── AquaLens Demo Animations ───────────────────────────────────────────── */
+
+/* Spill polygon shimmer — slow boundary pulse */
+@keyframes spill-shimmer {
+  0%, 100% { opacity: 0.70; }
+  50%       { opacity: 1.00; }
+}
+
+.spill-polygon-animate {
+  animation: spill-shimmer 4s ease-in-out infinite;
+}
+
+/* Vessel dot pulse */
+@keyframes vessel-pulse {
+  0%  { transform: scale(1);   opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+  100%{ transform: scale(1);   opacity: 1; }
+}
+
+/* Forecast polygon fade-in stagger */
+@keyframes forecast-fade-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.forecast-polygon {
+  animation: forecast-fade-in 0.6s ease-out both;
+}
+
+/* Custom vessel badge marker — ensure no Leaflet background interference */
+.custom-vessel-badge-marker,
+.custom-origin-badge-marker,
+.custom-asset-marker,
+.custom-map-label {
+  background: none !important;
+  border: none !important;
+}
+
+/* Map pulse keyframe (referenced by inline styles in MaritimeMap) */
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.7); }
+  70%       { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+}
+
+/* Slow spin for compass icon */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 12s linear infinite;
+}
+
+/* Tabular-nums utility for monospace number alignment */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}

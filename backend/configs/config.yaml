@@ -1,0 +1,236 @@
+# Satellite Oil Spill Detection & Attribution System Config (Modules 1–10)
+
+system:
+  project_name: "Satellite_Oil_Spill_Attribution_System"
+  mode: "MOCK"  # Always explicit mode indicator: MOCK vs REAL
+  random_seed: 42
+  device: "cpu"  # "cuda" or "cpu"
+
+paths:
+  raw_data_dir: "data/raw"
+  processed_data_dir: "data/processed"
+  mock_data_dir: "data/mock"
+  output_dir: "outputs"
+  visualizations_dir: "outputs/visualizations"
+  models_dir: "outputs/models"
+  predictions_dir: "outputs/predictions"
+
+mock_generator:
+  num_samples: 30
+  image_size: [256, 256]
+  spatial_resolution_m: 10.0
+  spill_probability: 0.7
+  max_slicks_per_scene: 3
+  lookalike_frequency: 0.4
+  ship_frequency: 0.6
+  max_ships_per_scene: 4
+  noise_level: 0.15
+  bounding_box: [12.0, 72.0, 13.0, 73.0]  # min_lat, min_lon, max_lat, max_lon
+
+preprocessing:
+  sar:
+    speckle_filter_kernel: 5
+    speckle_filter_method: "lee"
+    db_min: -30.0
+    db_max: 0.0
+    tile_size: 256
+  optical:
+    cloud_threshold: 0.65
+    bands: ["B02", "B03", "B04", "B08"]
+    tile_size: 256
+
+spatial_alignment:
+  target_crs: "EPSG:4326"
+  target_resolution_deg: 0.0001
+
+temporal_alignment:
+  tolerance_minutes: 30.0
+
+oil_spill_detection:
+  in_channels: 1
+  num_classes: 3  # 0: background, 1: oil spill, 2: look-alike
+  unet:
+    features: [32, 64, 128, 256]
+    bilinear: True
+  loss:
+    ce_weight: 0.5
+    dice_weight: 0.5
+  training:
+    batch_size: 4
+    learning_rate: 0.001
+    weight_decay: 0.0001
+    epochs: 5
+    val_split: 0.2
+    early_stopping_patience: 3
+  postprocessing:
+    prob_threshold: 0.5
+    min_area_pixels: 20
+    morph_kernel_size: 3
+
+fusion:
+  in_channels_sar: 1
+  in_channels_optical: 4
+  fusion_features: 64
+  training:
+    batch_size: 4
+    learning_rate: 0.001
+    epochs: 5
+
+confidence_engine:
+  thresholds:
+    high_confidence: 0.80
+    medium_confidence: 0.60
+    verification_required: 0.40
+  features:
+    - model_probability
+    - sar_texture_score
+    - shape_score
+    - optical_agreement
+    - wind_condition
+    - wave_condition
+    - temporal_consistency
+    - lookalike_probability
+
+ship_detection:
+  detector_type: "mock_cfar"
+  confidence_threshold: 0.70
+  cfar_guard_cells: 2
+  cfar_training_cells: 8
+  cfar_pfa: 1e-4
+
+# MODULE 6 — AIS MATCHING & ANOMALY ENGINE CONFIG
+ais_matching:
+  radius_km: 5.0
+  time_window_minutes: 30.0
+  gap_threshold_minutes: 30.0
+  weights:
+    position_error: 0.30
+    trajectory_error: 0.25
+    ais_gap: 0.20
+    course_difference: 0.15
+    speed_difference: 0.10
+
+# MODULE 7 — HINDCAST / SPILL ORIGIN ENGINE CONFIG
+hindcast:
+  particle_count: 500
+  dt_minutes: 10.0
+  historical_hours: 6.0
+  windage: 0.03
+  diffusion: 0.001
+
+# MODULE 8 — VESSEL ATTRIBUTION ENGINE CONFIG
+vessel_attribution:
+  weights:
+    distance_score: 0.20
+    time_score: 0.20
+    trajectory_score: 0.20
+    physical_match: 0.15
+    ais_anomaly: 0.10
+    behavior_anomaly: 0.10
+    data_quality: 0.05
+
+# MODULE 9 — FORWARD SPILL FORECAST ENGINE CONFIG
+forecast:
+  particle_count: 500
+  dt_minutes: 10.0
+  horizons_hours: [6, 12, 24, 48, 72]
+  windage: 0.03
+  diffusion: 0.001
+
+# MODULE 10 — UNCERTAINTY ENGINE CONFIG
+uncertainty:
+  num_simulations: 100
+  wind_uncertainty: 0.15
+  current_uncertainty: 0.10
+  windage_uncertainty: 0.005
+  diffusion_uncertainty: 0.0005
+  release_time_uncertainty_minutes: 30.0
+
+# MODULE 11 — IMPACT PREDICTION CONFIG
+# NOTE: All weights and sensitivity values are PROTOTYPE HEURISTICS, not scientifically validated constants.
+impact:
+  severity_weights:
+    area_km2_factor: 0.5         # contribution of spill area to severity
+    oil_probability_factor: 0.3  # contribution of oil probability to severity
+    wind_factor: 0.2             # contribution of wind speed to severity
+    area_normalization_km2: 100.0  # reference area for normalization
+  asset_impact_weights:
+    impact_probability: 0.50   # from M10 Monte Carlo
+    time_factor: 0.25          # urgency based on ETA
+    sensitivity: 0.15          # environmental sensitivity of asset type
+    severity: 0.10             # spill severity contribution
+  # Sensitivity defaults by asset type — prototype heuristic weights (0–1)
+  sensitivity_defaults:
+    Protected Area: 1.0
+    Beach: 0.85
+    Fishery Zone: 0.80
+    Critical Infrastructure: 0.90
+    Coastal Settlement: 0.75
+    Port: 0.70
+    Tourism Area: 0.65
+    Geographic Asset: 0.60    # fallback for unknown types
+
+# MODULE 12 — PRIORITY SCORING CONFIG
+# Weights match the formula specified in the project brief.
+priority_scoring:
+  weights:
+    impact: 0.30
+    time_to_impact: 0.20
+    oil_severity: 0.20
+    detection_confidence: 0.15
+    environmental_sensitivity: 0.10
+    data_quality: 0.05
+
+# MODULE 13 — RESOURCE OPTIMIZATION CONFIG
+# Resources are mock fleet definitions for SCENE_001 demonstration.
+resource_optimization:
+  max_resources_per_target: 2
+  feasibility_horizon_hours: 48.0
+  resources:
+    - type: skimmer
+      count: 3
+      speed_knots: 8
+      capacity_tons: 50
+      range_km: 200
+      home_lat: 12.1
+      home_lon: 72.1
+    - type: containment_boom
+      count: 5
+      speed_knots: 0
+      capacity_tons: 100
+      range_km: 50
+      home_lat: 12.15
+      home_lon: 72.15
+    - type: patrol_vessel
+      count: 2
+      speed_knots: 15
+      capacity_tons: 10
+      range_km: 500
+      home_lat: 12.05
+      home_lon: 72.05
+    - type: drone
+      count: 4
+      speed_knots: 40
+      capacity_tons: 0.5
+      range_km: 100
+      home_lat: 12.2
+      home_lon: 72.2
+    - type: aircraft
+      count: 1
+      speed_knots: 120
+      capacity_tons: 5
+      range_km: 1000
+      home_lat: 12.3
+      home_lon: 72.3
+
+# MODULE 17 — ACTION RECOMMENDATION CONFIG
+# Prototype decision thresholds — not scientifically validated operational parameters.
+action_recommendation:
+  thresholds:
+    confidence_low: 0.40            # below this → VERIFY action
+    confidence_verification: 0.70   # below this → request verification imagery
+    uncertainty_high: 0.35          # (1 - pred_conf) > this → uncertainty too high
+    priority_critical: 80.0         # priority >= this → URGENT_RESPONSE / ESCALATE
+    priority_high: 60.0             # priority >= this → DEPLOY_RESOURCES
+    priority_medium: 40.0           # priority >= this → INVESTIGATE
+    attribution_investigation: 0.40 # attribution_score >= this → recommend vessel investigation
