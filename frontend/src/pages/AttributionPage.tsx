@@ -4,7 +4,7 @@ import { CrystallinePanel } from '../components/ui/CrystallinePanel';
 import { CommandMapFrame } from '../components/maps/CommandMapFrame';
 import { Ship, Search, AlertTriangle, ShieldCheck, ArrowUpDown, Eye } from 'lucide-react';
 import { DEMO_INCIDENT } from '../data/demoIncident';
-import { DEMO_VESSELS } from '../data/demoVessels';
+import { DEMO_VESSELS, DemoVessel } from '../data/demoVessels';
 import {
   DEMO_ALL_SPILL_POLYGONS,
   DEMO_ORIGIN_ZONE,
@@ -19,7 +19,7 @@ export const AttributionPage: React.FC = () => {
   const [filterType, setFilterType] = useState<'ALL' | 'DARK' | 'HIGH_SCORE'>('ALL');
   const [sortField, setSortField] = useState<'rank' | 'score'>('rank');
   const [sortAsc, setSortAsc] = useState(true);
-  const [selectedVessel, setSelectedVessel] = useState<SuspectVesselDetail | null>(null);
+  const [selectedVessel, setSelectedVessel] = useState<DemoVessel | null>(null);
 
   const filtered = useMemo(() => {
     let list = [...DEMO_VESSELS];

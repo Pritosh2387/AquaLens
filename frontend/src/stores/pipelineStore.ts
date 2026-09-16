@@ -58,6 +58,8 @@ export interface PipelineState {
   provenance: DataProvenance;
   lastSuccessfulExecution: string | null;
   isPipelineRunning: boolean;
+  /** True once pipeline has been executed at least once in this session */
+  pipelineExecuted: boolean;
 
   // Actions
   setCurrentScene: (sceneId: string) => void;
@@ -70,6 +72,7 @@ export interface PipelineState {
   isModuleAvailable: (moduleCode: string) => boolean;
   clearErrors: () => void;
   resetPipeline: () => void;
+  setPipelineExecuted: (executed: boolean) => void;
 }
 
 export const usePipelineStore = create<PipelineState>((set, get) => ({
@@ -86,6 +89,7 @@ export const usePipelineStore = create<PipelineState>((set, get) => ({
   provenance: 'OBSERVED',
   lastSuccessfulExecution: null,
   isPipelineRunning: false,
+  pipelineExecuted: false,
 
   setCurrentScene: (sceneId: string) =>
     set({
@@ -144,6 +148,7 @@ export const usePipelineStore = create<PipelineState>((set, get) => ({
       failedModule: null,
       failureReason: null,
       isPipelineRunning: false,
+      pipelineExecuted: true,
       lastSuccessfulExecution: new Date().toISOString(),
       provenance: (data.mode as DataProvenance) || 'OBSERVED',
       moduleOutputs: {
@@ -194,6 +199,8 @@ export const usePipelineStore = create<PipelineState>((set, get) => ({
 
   clearErrors: () => set({ failedModule: null, failureReason: null }),
 
+  setPipelineExecuted: (executed: boolean) => set({ pipelineExecuted: executed }),
+
   resetPipeline: () =>
     set({
       completedModules: [],
@@ -204,5 +211,6 @@ export const usePipelineStore = create<PipelineState>((set, get) => ({
       pipelineData: null,
       lastSuccessfulExecution: null,
       isPipelineRunning: false,
+      pipelineExecuted: false,
     }),
 }));
