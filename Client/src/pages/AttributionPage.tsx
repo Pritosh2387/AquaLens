@@ -2,8 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { SectionHeader } from '../components/ui/SectionHeader';
 import { CrystallinePanel } from '../components/ui/CrystallinePanel';
 import { CommandMapFrame } from '../components/maps/CommandMapFrame';
-import { Ship, Search, AlertTriangle, ShieldCheck, ArrowUpDown, Eye } from 'lucide-react';
-import { DEMO_INCIDENT } from '../data/demoIncident';
+import { Ship, Search, AlertTriangle, ShieldCheck, ArrowUpDown, Eye, Play } from 'lucide-react';
+import { getDemoIncident } from '../data/demoIncident';
 import { DEMO_VESSELS, DemoVessel } from '../data/demoVessels';
 import {
   DEMO_ALL_SPILL_POLYGONS,
@@ -12,14 +12,29 @@ import {
 } from '../data/demoMapData';
 import { DEMO_METOCEAN } from '../data/demoForecast';
 import { VesselDetailModal, SuspectVesselDetail } from '../components/maritime/VesselDetailModal';
+import { usePipelineStore } from '../stores/pipelineStore';
+import { useIncidentStore } from '../stores/incidentStore';
+import { useRunPipeline } from '../hooks/usePipeline';
+import { CommandButton } from '../components/ui/CommandButton';
 
 export const AttributionPage: React.FC = () => {
-  const inc = DEMO_INCIDENT;
+  const { pipelineExecuted, isPipelineRunning } = usePipelineStore();
+  const { selectedSceneId, pipelineMode } = useIncidentStore();
+  const runPipelineMutation = useRunPipeline();
+  const inc = getDemoIncident(selectedSceneId);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'ALL' | 'DARK' | 'HIGH_SCORE'>('ALL');
   const [sortField, setSortField] = useState<'rank' | 'score'>('rank');
   const [sortAsc, setSortAsc] = useState(true);
   const [selectedVessel, setSelectedVessel] = useState<DemoVessel | null>(null);
+
+  const handleRunPipeline = () => {
+    runPipelineMutation.mutate({
+      scene_id: selectedSceneId,
+      include_modules_11_15: pipelineMode === 'EXTENDED' || pipelineMode === 'FULL_DECISION_SUPPORT',
+      include_modules_16_17: pipelineMode === 'FULL_DECISION_SUPPORT',
+    });
+  };
 
   const filtered = useMemo(() => {
     let list = [...DEMO_VESSELS];
@@ -77,6 +92,24 @@ export const AttributionPage: React.FC = () => {
 
   return (
     <div className="space-y-5 font-mono text-xs">
+      {!pipelineExecuted && (
+        <div className="crystalline-panel rounded-xl p-6 flex flex-col items-center gap-4 border-blue-500/30 bg-blue-950/10">
+          <div className="text-slate-400 text-sm font-mono text-center">
+            Run the pipeline to populate AIS correlation, suspect vessel ranking and attribution evidence.
+          </div>
+          <CommandButton
+            variant="primary"
+            size="lg"
+            loading={isPipelineRunning}
+            icon={<Play className="w-4 h-4 fill-current" />}
+            onClick={handleRunPipeline}
+            className="px-8"
+          >
+            {isPipelineRunning ? 'Running Pipeline...' : 'RUN PIPELINE'}
+          </CommandButton>
+        </div>
+      )}
+      {pipelineExecuted && (<>
       <SectionHeader
         title="Vessel Attribution"
         subtitle={`AIS correlation & suspect ranking — Incident ${inc.incidentId} (Modules M5, M6, M8)`}
@@ -301,6 +334,7 @@ export const AttributionPage: React.FC = () => {
       {selectedVessel && modalVessel && (
         <VesselDetailModal vessel={modalVessel} onClose={() => setSelectedVessel(null)} />
       )}
+      </>)}
     </div>
   );
 };

@@ -1,17 +1,32 @@
 import React, { useState } from 'react';
 import { SectionHeader } from '../components/ui/SectionHeader';
 import { CrystallinePanel } from '../components/ui/CrystallinePanel';
-import { TrendingDown, TrendingUp, AlertTriangle, CheckCircle2, Minus } from 'lucide-react';
+import { TrendingDown, TrendingUp, AlertTriangle, CheckCircle2, Minus, Play } from 'lucide-react';
 import { DEMO_INCIDENT } from '../data/demoIncident';
 import { DEMO_WHATIF_SCENARIOS } from '../data/demoResources';
+import { usePipelineStore } from '../stores/pipelineStore';
+import { useIncidentStore } from '../stores/incidentStore';
+import { useRunPipeline } from '../hooks/usePipeline';
+import { CommandButton } from '../components/ui/CommandButton';
 
 const BASE_SCENARIO_ID = 'current';
 
 export const WhatIfPage: React.FC = () => {
   const [selectedId, setSelectedId] = useState<string>(BASE_SCENARIO_ID);
+  const { pipelineExecuted, isPipelineRunning } = usePipelineStore();
+  const { selectedSceneId, pipelineMode } = useIncidentStore();
+  const runPipelineMutation = useRunPipeline();
   const inc = DEMO_INCIDENT;
   const base = DEMO_WHATIF_SCENARIOS.find((s) => s.id === BASE_SCENARIO_ID)!;
   const selected = DEMO_WHATIF_SCENARIOS.find((s) => s.id === selectedId)!;
+
+  const handleRunPipeline = () => {
+    runPipelineMutation.mutate({
+      scene_id: selectedSceneId,
+      include_modules_11_15: pipelineMode === 'EXTENDED' || pipelineMode === 'FULL_DECISION_SUPPORT',
+      include_modules_16_17: pipelineMode === 'FULL_DECISION_SUPPORT',
+    });
+  };
 
   const priorityColor = (p: string) => {
     if (p === 'CRITICAL') return 'text-red-400 bg-red-950/40 border-red-500/40';
@@ -36,6 +51,24 @@ export const WhatIfPage: React.FC = () => {
 
   return (
     <div className="space-y-5 font-mono text-xs">
+      {!pipelineExecuted && (
+        <div className="crystalline-panel rounded-xl p-6 flex flex-col items-center gap-4 border-blue-500/30 bg-blue-950/10">
+          <div className="text-slate-400 text-sm font-mono text-center">
+            Run the pipeline to unlock the what-if scenario simulator and compare response strategies.
+          </div>
+          <CommandButton
+            variant="primary"
+            size="lg"
+            loading={isPipelineRunning}
+            icon={<Play className="w-4 h-4 fill-current" />}
+            onClick={handleRunPipeline}
+            className="px-8"
+          >
+            {isPipelineRunning ? 'Running Pipeline...' : 'RUN PIPELINE'}
+          </CommandButton>
+        </div>
+      )}
+      {pipelineExecuted && (<>
       <SectionHeader
         title="What-If Simulator"
         subtitle={`Response scenario comparison — Incident ${inc.incidentId} (Module M15)`}
@@ -295,6 +328,7 @@ export const WhatIfPage: React.FC = () => {
           </div>
         </CrystallinePanel>
       </div>
+      </>)}
     </div>
   );
 };

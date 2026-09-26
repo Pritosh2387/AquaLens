@@ -2,9 +2,13 @@ import React from 'react';
 import { SectionHeader } from '../components/ui/SectionHeader';
 import { CrystallinePanel } from '../components/ui/CrystallinePanel';
 import { CommandMapFrame } from '../components/maps/CommandMapFrame';
-import { CheckCircle2, XCircle, Target, BarChart3, ArrowRight, TrendingUp } from 'lucide-react';
+import { CheckCircle2, XCircle, Target, BarChart3, ArrowRight, TrendingUp, Play } from 'lucide-react';
 import { DEMO_INCIDENT } from '../data/demoIncident';
 import { DEMO_PREDICTED_POLYGON, DEMO_OBSERVED_POLYGON } from '../data/demoMapData';
+import { usePipelineStore } from '../stores/pipelineStore';
+import { useIncidentStore } from '../stores/incidentStore';
+import { useRunPipeline } from '../hooks/usePipeline';
+import { CommandButton } from '../components/ui/CommandButton';
 
 const pvr = DEMO_INCIDENT.predictionVsReality;
 
@@ -52,7 +56,18 @@ const METRICS = [
 ];
 
 export const FeedbackPage: React.FC = () => {
+  const { pipelineExecuted, isPipelineRunning } = usePipelineStore();
+  const { selectedSceneId, pipelineMode } = useIncidentStore();
+  const runPipelineMutation = useRunPipeline();
   const inc = DEMO_INCIDENT;
+
+  const handleRunPipeline = () => {
+    runPipelineMutation.mutate({
+      scene_id: selectedSceneId,
+      include_modules_11_15: pipelineMode === 'EXTENDED' || pipelineMode === 'FULL_DECISION_SUPPORT',
+      include_modules_16_17: pipelineMode === 'FULL_DECISION_SUPPORT',
+    });
+  };
 
   const passCount = METRICS.filter((m) => m.pass).length;
   const overallGrade = passCount === 5 ? 'EXCELLENT' : passCount >= 3 ? 'GOOD' : 'NEEDS IMPROVEMENT';
@@ -60,6 +75,24 @@ export const FeedbackPage: React.FC = () => {
 
   return (
     <div className="space-y-5 font-mono text-xs">
+      {!pipelineExecuted && (
+        <div className="crystalline-panel rounded-xl p-6 flex flex-col items-center gap-4 border-blue-500/30 bg-blue-950/10">
+          <div className="text-slate-400 text-sm font-mono text-center">
+            Run the pipeline to compare model predictions against satellite observations.
+          </div>
+          <CommandButton
+            variant="primary"
+            size="lg"
+            loading={isPipelineRunning}
+            icon={<Play className="w-4 h-4 fill-current" />}
+            onClick={handleRunPipeline}
+            className="px-8"
+          >
+            {isPipelineRunning ? 'Running Pipeline...' : 'RUN PIPELINE'}
+          </CommandButton>
+        </div>
+      )}
+      {pipelineExecuted && (<>
       <SectionHeader
         title="Prediction vs Reality"
         subtitle={`Model accuracy validation — Incident ${inc.incidentId} (Module M10)`}
@@ -201,6 +234,7 @@ export const FeedbackPage: React.FC = () => {
           </div>
         </CrystallinePanel>
       </div>
+      </>)}
     </div>
   );
 };

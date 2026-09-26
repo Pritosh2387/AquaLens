@@ -3,10 +3,13 @@ import { SectionHeader } from '../components/ui/SectionHeader';
 import { CrystallinePanel } from '../components/ui/CrystallinePanel';
 import {
   ShieldAlert, CheckCircle2, AlertTriangle, Radio, Ship, MapPin,
-  ArrowDown, Layers, TrendingUp, Zap, Eye, GitBranch,
+  ArrowDown, Layers, TrendingUp, Zap, Eye, GitBranch, Play,
 } from 'lucide-react';
 import { DEMO_INCIDENT } from '../data/demoIncident';
 import { CommandButton } from '../components/ui/CommandButton';
+import { usePipelineStore } from '../stores/pipelineStore';
+import { useIncidentStore } from '../stores/incidentStore';
+import { useRunPipeline } from '../hooks/usePipeline';
 
 interface EvidenceNode {
   id: string;
@@ -142,11 +145,40 @@ const statusBadge = (status: string) => {
 export const EvidencePage: React.FC = () => {
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [accepted, setAccepted] = useState(false);
+  const { pipelineExecuted, isPipelineRunning } = usePipelineStore();
+  const { selectedSceneId, pipelineMode } = useIncidentStore();
+  const runPipelineMutation = useRunPipeline();
 
   const inc = INC;
 
+  const handleRunPipeline = () => {
+    runPipelineMutation.mutate({
+      scene_id: selectedSceneId,
+      include_modules_11_15: pipelineMode === 'EXTENDED' || pipelineMode === 'FULL_DECISION_SUPPORT',
+      include_modules_16_17: pipelineMode === 'FULL_DECISION_SUPPORT',
+    });
+  };
+
   return (
     <div className="space-y-5 font-mono text-xs">
+      {!pipelineExecuted && (
+        <div className="crystalline-panel rounded-xl p-6 flex flex-col items-center gap-4 border-blue-500/30 bg-blue-950/10">
+          <div className="text-slate-400 text-sm font-mono text-center">
+            Run the pipeline to load the evidence chain, AI reasoning graph and recommendation details.
+          </div>
+          <CommandButton
+            variant="primary"
+            size="lg"
+            loading={isPipelineRunning}
+            icon={<Play className="w-4 h-4 fill-current" />}
+            onClick={handleRunPipeline}
+            className="px-8"
+          >
+            {isPipelineRunning ? 'Running Pipeline...' : 'RUN PIPELINE'}
+          </CommandButton>
+        </div>
+      )}
+      {pipelineExecuted && (<>
       <SectionHeader
         title="Evidence & Recommendations"
         subtitle={`Intelligence chain analysis — Incident ${inc.incidentId} (Modules M16–M17)`}
@@ -388,6 +420,7 @@ export const EvidencePage: React.FC = () => {
           </div>
         </CrystallinePanel>
       </div>
+      </>)}
     </div>
   );
 };

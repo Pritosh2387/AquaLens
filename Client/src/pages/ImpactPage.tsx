@@ -3,8 +3,8 @@ import { SectionHeader } from '../components/ui/SectionHeader';
 import { CrystallinePanel } from '../components/ui/CrystallinePanel';
 import { CommandMapFrame } from '../components/maps/CommandMapFrame';
 import { RadialGauge } from '../components/ui/RadialGauge';
-import { AlertTriangle, Clock, Fish, Leaf, Users, DollarSign } from 'lucide-react';
-import { DEMO_INCIDENT } from '../data/demoIncident';
+import { AlertTriangle, Clock, Fish, Leaf, Users, DollarSign, Play } from 'lucide-react';
+import { getDemoIncident } from '../data/demoIncident';
 import { DEMO_IMPACT_ASSETS, DEMO_IMPACT_SUMMARY } from '../data/demoImpact';
 import {
   DEMO_ALL_SPILL_POLYGONS,
@@ -13,10 +13,25 @@ import {
   DEMO_UNCERTAINTY_ZONE,
 } from '../data/demoMapData';
 import { DEMO_METOCEAN } from '../data/demoForecast';
+import { usePipelineStore } from '../stores/pipelineStore';
+import { useIncidentStore } from '../stores/incidentStore';
+import { useRunPipeline } from '../hooks/usePipeline';
+import { CommandButton } from '../components/ui/CommandButton';
 
 export const ImpactPage: React.FC = () => {
-  const inc = DEMO_INCIDENT;
+  const { pipelineExecuted, isPipelineRunning } = usePipelineStore();
+  const { selectedSceneId, pipelineMode } = useIncidentStore();
+  const runPipelineMutation = useRunPipeline();
+  const inc = getDemoIncident(selectedSceneId);
   const summary = DEMO_IMPACT_SUMMARY;
+
+  const handleRunPipeline = () => {
+    runPipelineMutation.mutate({
+      scene_id: selectedSceneId,
+      include_modules_11_15: pipelineMode === 'EXTENDED' || pipelineMode === 'FULL_DECISION_SUPPORT',
+      include_modules_16_17: pipelineMode === 'FULL_DECISION_SUPPORT',
+    });
+  };
 
   const riskGauges = [
     { value: summary.ecologicalRisk, label: 'Ecological Risk', color: 'red' as const, icon: Leaf },
@@ -33,6 +48,24 @@ export const ImpactPage: React.FC = () => {
 
   return (
     <div className="space-y-5 font-mono text-xs">
+      {!pipelineExecuted && (
+        <div className="crystalline-panel rounded-xl p-6 flex flex-col items-center gap-4 border-blue-500/30 bg-blue-950/10">
+          <div className="text-slate-400 text-sm font-mono text-center">
+            Run the pipeline to load impact assessments, risk gauges, at-risk assets and probability bands.
+          </div>
+          <CommandButton
+            variant="primary"
+            size="lg"
+            loading={isPipelineRunning}
+            icon={<Play className="w-4 h-4 fill-current" />}
+            onClick={handleRunPipeline}
+            className="px-8"
+          >
+            {isPipelineRunning ? 'Running Pipeline...' : 'RUN PIPELINE'}
+          </CommandButton>
+        </div>
+      )}
+      {pipelineExecuted && (<>
       <SectionHeader
         title="Impact & Uncertainty"
         subtitle={`Environmental & economic risk assessment — Incident ${inc.incidentId} (Modules M11–M13)`}
@@ -168,6 +201,7 @@ export const ImpactPage: React.FC = () => {
           </table>
         </div>
       </CrystallinePanel>
+      </>)}
     </div>
   );
 };

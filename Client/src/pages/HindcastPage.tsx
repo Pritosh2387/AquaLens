@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { SectionHeader } from '../components/ui/SectionHeader';
 import { CrystallinePanel } from '../components/ui/CrystallinePanel';
 import { CommandMapFrame } from '../components/maps/CommandMapFrame';
-import { MapPin, Clock, Compass, History, Wind, Waves, Thermometer, ChevronRight } from 'lucide-react';
-import { DEMO_INCIDENT } from '../data/demoIncident';
+import { MapPin, Clock, Compass, History, Wind, Waves, Thermometer, ChevronRight, Play } from 'lucide-react';
+import { getDemoIncident } from '../data/demoIncident';
 import {
   DEMO_ALL_SPILL_POLYGONS,
   DEMO_ORIGIN_ZONE,
@@ -11,6 +11,10 @@ import {
   DEMO_HINDCAST_TRAJECTORY,
 } from '../data/demoMapData';
 import { DEMO_METOCEAN } from '../data/demoForecast';
+import { usePipelineStore } from '../stores/pipelineStore';
+import { useIncidentStore } from '../stores/incidentStore';
+import { useRunPipeline } from '../hooks/usePipeline';
+import { CommandButton } from '../components/ui/CommandButton';
 
 const HINDCAST_STEPS = [
   { time: '−3h 50m', label: 'T −3.8h', lat: 15.910, lon: 68.580, desc: 'Probable release at origin zone.' },
@@ -22,7 +26,18 @@ const HINDCAST_STEPS = [
 
 export const HindcastPage: React.FC = () => {
   const [activeStep, setActiveStep] = useState(4);
-  const inc = DEMO_INCIDENT;
+  const { pipelineExecuted, isPipelineRunning } = usePipelineStore();
+  const { selectedSceneId, pipelineMode } = useIncidentStore();
+  const runPipelineMutation = useRunPipeline();
+  const inc = getDemoIncident(selectedSceneId);
+
+  const handleRunPipeline = () => {
+    runPipelineMutation.mutate({
+      scene_id: selectedSceneId,
+      include_modules_11_15: pipelineMode === 'EXTENDED' || pipelineMode === 'FULL_DECISION_SUPPORT',
+      include_modules_16_17: pipelineMode === 'FULL_DECISION_SUPPORT',
+    });
+  };
 
   const kpiCards = [
     {
@@ -71,6 +86,24 @@ export const HindcastPage: React.FC = () => {
 
   return (
     <div className="space-y-5 font-mono text-xs">
+      {!pipelineExecuted && (
+        <div className="crystalline-panel rounded-xl p-6 flex flex-col items-center gap-4 border-blue-500/30 bg-blue-950/10">
+          <div className="text-slate-400 text-sm font-mono text-center">
+            Run the pipeline to reconstruct the backward trajectory, origin zone and hindcast timeline.
+          </div>
+          <CommandButton
+            variant="primary"
+            size="lg"
+            loading={isPipelineRunning}
+            icon={<Play className="w-4 h-4 fill-current" />}
+            onClick={handleRunPipeline}
+            className="px-8"
+          >
+            {isPipelineRunning ? 'Running Pipeline...' : 'RUN PIPELINE'}
+          </CommandButton>
+        </div>
+      )}
+      {pipelineExecuted && (<>
       <SectionHeader
         title="Origin & Hindcast"
         subtitle={`Backward drift reconstruction — Incident ${inc.incidentId} (Module M7)`}
@@ -236,6 +269,7 @@ export const HindcastPage: React.FC = () => {
           </div>
         </CrystallinePanel>
       </div>
+      </>)}
     </div>
   );
 };

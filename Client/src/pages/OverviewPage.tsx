@@ -20,7 +20,7 @@ import {
   Play,
 } from 'lucide-react';
 import { CommandButton } from '../components/ui/CommandButton';
-import { DEMO_INCIDENT } from '../data/demoIncident';
+import { getDemoIncident } from '../data/demoIncident';
 import {
   DEMO_ALL_SPILL_POLYGONS,
   DEMO_SPILL_CORE,
@@ -42,7 +42,7 @@ export const OverviewPage: React.FC = () => {
   const { pipelineExecuted, isPipelineRunning } = usePipelineStore();
   const { selectedSceneId, pipelineMode } = useIncidentStore();
   const runPipelineMutation = useRunPipeline();
-  const inc = DEMO_INCIDENT;
+  const inc = getDemoIncident(selectedSceneId);
 
   const handleRunPipeline = () => {
     runPipelineMutation.mutate({

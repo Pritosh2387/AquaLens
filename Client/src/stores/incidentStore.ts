@@ -44,6 +44,7 @@ export const useIncidentStore = create<IncidentState>((set) => ({
   setSceneId: (sceneId) => {
     set({ selectedSceneId: sceneId });
     usePipelineStore.getState().setCurrentScene(sceneId);
+    usePipelineStore.getState().resetPipeline();
   },
   setActiveHorizon: (horizon) => set({ activeHorizon: horizon }),
   setSelectedTimeOffset: (offset) => set({ selectedTimeOffset: offset }),

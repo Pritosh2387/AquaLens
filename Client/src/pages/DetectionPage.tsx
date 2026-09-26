@@ -3,10 +3,14 @@ import { SectionHeader } from '../components/ui/SectionHeader';
 import { CrystallinePanel } from '../components/ui/CrystallinePanel';
 import { CommandMapFrame } from '../components/maps/CommandMapFrame';
 import { RadialGauge } from '../components/ui/RadialGauge';
-import { CheckCircle2, Info, Eye, Satellite, Layers, Signal, Zap } from 'lucide-react';
-import { DEMO_INCIDENT } from '../data/demoIncident';
+import { CheckCircle2, Info, Eye, Layers, Signal, Zap, Play } from 'lucide-react';
+import { getDemoIncident } from '../data/demoIncident';
 import { DEMO_ALL_SPILL_POLYGONS, DEMO_SPILL_CORE } from '../data/demoMapData';
 import { DEMO_METOCEAN } from '../data/demoForecast';
+import { usePipelineStore } from '../stores/pipelineStore';
+import { useIncidentStore } from '../stores/incidentStore';
+import { useRunPipeline } from '../hooks/usePipeline';
+import { CommandButton } from '../components/ui/CommandButton';
 
 const SPECTRAL_DATA = [
   { wl: '0.4μm', oil: 12, water: 68, land: 42 },
@@ -21,7 +25,18 @@ const SPECTRAL_DATA = [
 ];
 
 export const DetectionPage: React.FC = () => {
-  const inc = DEMO_INCIDENT;
+  const { pipelineExecuted, isPipelineRunning } = usePipelineStore();
+  const { selectedSceneId, pipelineMode } = useIncidentStore();
+  const runPipelineMutation = useRunPipeline();
+  const inc = getDemoIncident(selectedSceneId);
+
+  const handleRunPipeline = () => {
+    runPipelineMutation.mutate({
+      scene_id: selectedSceneId,
+      include_modules_11_15: pipelineMode === 'EXTENDED' || pipelineMode === 'FULL_DECISION_SUPPORT',
+      include_modules_16_17: pipelineMode === 'FULL_DECISION_SUPPORT',
+    });
+  };
 
   const detailRows = [
     { label: 'Model Architecture', value: inc.sensor.model, color: 'text-sky-300' },
@@ -45,6 +60,24 @@ export const DetectionPage: React.FC = () => {
 
   return (
     <div className="space-y-5 font-mono text-xs">
+      {!pipelineExecuted && (
+        <div className="crystalline-panel rounded-xl p-6 flex flex-col items-center gap-4 border-blue-500/30 bg-blue-950/10">
+          <div className="text-slate-400 text-sm font-mono text-center">
+            Run the pipeline to load detection results, sensor fusion data and spill confirmation.
+          </div>
+          <CommandButton
+            variant="primary"
+            size="lg"
+            loading={isPipelineRunning}
+            icon={<Play className="w-4 h-4 fill-current" />}
+            onClick={handleRunPipeline}
+            className="px-8"
+          >
+            {isPipelineRunning ? 'Running Pipeline...' : 'RUN PIPELINE'}
+          </CommandButton>
+        </div>
+      )}
+      {pipelineExecuted && (<>
       <SectionHeader
         title="Spill Detection"
         subtitle={`AI-powered multi-sensor detection — Incident ${inc.incidentId} (Modules M1–M4)`}
@@ -232,6 +265,7 @@ export const DetectionPage: React.FC = () => {
           </div>
         </CrystallinePanel>
       </div>
+      </>)}
     </div>
   );
 };

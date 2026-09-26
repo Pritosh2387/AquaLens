@@ -2,10 +2,8 @@ export const DEFAULT_SCENE_ID = 'AL-2026-0915-IND-047';
 
 export const AVAILABLE_SCENES = [
   'AL-2026-0915-IND-047',
-  ...Array.from({ length: 29 }, (_, i) => {
-    const num = String(i + 2).padStart(3, '0');
-    return `SCENE_${num}`;
-  }),
+  'AL-2026-0918-MUM-112',
+  'AL-2026-0921-CHE-078',
 ];
 
 // Centered on AQL-047 Arabian Sea incident (15.82°N, 68.74°E)

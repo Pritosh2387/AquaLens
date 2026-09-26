@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { SectionHeader } from '../components/ui/SectionHeader';
 import { CrystallinePanel } from '../components/ui/CrystallinePanel';
 import { CommandMapFrame } from '../components/maps/CommandMapFrame';
-import { Zap, CheckCircle2, Package, Anchor, Ship, Wind, Users } from 'lucide-react';
+import { Zap, CheckCircle2, Package, Anchor, Ship, Wind, Users, Play } from 'lucide-react';
 import { CommandButton } from '../components/ui/CommandButton';
-import { DEMO_INCIDENT } from '../data/demoIncident';
+import { getDemoIncident } from '../data/demoIncident';
 import {
   DEMO_AVAILABLE_RESOURCES,
   DEMO_REQUIRED_RESOURCES,
@@ -18,13 +18,27 @@ import {
   DEMO_IMPACT_ZONE_HIGH,
 } from '../data/demoMapData';
 import { DEMO_METOCEAN } from '../data/demoForecast';
+import { usePipelineStore } from '../stores/pipelineStore';
+import { useIncidentStore } from '../stores/incidentStore';
+import { useRunPipeline } from '../hooks/usePipeline';
 
 export const ResourcesPage: React.FC = () => {
   const [planGenerated, setPlanGenerated] = useState(false);
-  const inc = DEMO_INCIDENT;
+  const { pipelineExecuted, isPipelineRunning } = usePipelineStore();
+  const { selectedSceneId, pipelineMode } = useIncidentStore();
+  const runPipelineMutation = useRunPipeline();
+  const inc = getDemoIncident(selectedSceneId);
   const avail = DEMO_AVAILABLE_RESOURCES;
   const req = DEMO_REQUIRED_RESOURCES;
   const plan = DEMO_OPTIMAL_PLAN;
+
+  const handleRunPipeline = () => {
+    runPipelineMutation.mutate({
+      scene_id: selectedSceneId,
+      include_modules_11_15: pipelineMode === 'EXTENDED' || pipelineMode === 'FULL_DECISION_SUPPORT',
+      include_modules_16_17: pipelineMode === 'FULL_DECISION_SUPPORT',
+    });
+  };
 
   const resourceTypes = [
     { icon: Package, label: 'Skimmers', available: avail.skimmers, required: req.skimmers, color: 'sky', unallocated: plan.unallocated.skimmers },
@@ -44,6 +58,24 @@ export const ResourcesPage: React.FC = () => {
 
   return (
     <div className="space-y-5 font-mono text-xs">
+      {!pipelineExecuted && (
+        <div className="crystalline-panel rounded-xl p-6 flex flex-col items-center gap-4 border-blue-500/30 bg-blue-950/10">
+          <div className="text-slate-400 text-sm font-mono text-center">
+            Run the pipeline to load resource availability, requirements and generate the optimal response plan.
+          </div>
+          <CommandButton
+            variant="primary"
+            size="lg"
+            loading={isPipelineRunning}
+            icon={<Play className="w-4 h-4 fill-current" />}
+            onClick={handleRunPipeline}
+            className="px-8"
+          >
+            {isPipelineRunning ? 'Running Pipeline...' : 'RUN PIPELINE'}
+          </CommandButton>
+        </div>
+      )}
+      {pipelineExecuted && (<>
       <SectionHeader
         title="Resource Planner"
         subtitle={`Optimal response allocation — Incident ${inc.incidentId} (Module M14)`}
@@ -182,6 +214,7 @@ export const ResourcesPage: React.FC = () => {
           </div>
         </div>
       </div>
+      </>)}
     </div>
   );
 };
