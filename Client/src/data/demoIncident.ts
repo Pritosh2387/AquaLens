@@ -29,11 +29,11 @@ const SCENE_1 = {
 
   spillProbability: 0.94,
   confidence: 0.91,
-  falsePositiveRisk: 0.08,
+  falsePositiveRisk: 0.06,
 
   estimatedArea: 42.7,
   estimatedAreaStr: '42.7 km²',
-  estimatedVolume: '3,200 – 4,800 tonnes',
+  estimatedVolume: '1,800 – 3,600 tonnes',
   spillType: 'Likely Crude Oil',
 
   releaseWindow: {

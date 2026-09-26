@@ -53,7 +53,7 @@ export const DetectionPage: React.FC = () => {
     { label: 'SAR Contribution', value: `${(inc.sensor.sarContribution * 100).toFixed(0)}%`, color: 'text-amber-300' },
     { label: 'Optical Contribution', value: `${(inc.sensor.opticalContribution * 100).toFixed(0)}%`, color: 'text-emerald-300' },
     { label: 'Fusion Confidence', value: `${(inc.sensor.fusionConfidence * 100).toFixed(0)}%`, color: 'text-cyan-300' },
-    { label: 'False Positive Risk', value: `Low (${inc.sensor.fusionConfidence < 0.5 ? 'HIGH' : (1 - inc.sensor.fusionConfidence).toFixed(2)})`, color: 'text-emerald-400' },
+    { label: 'False Positive Risk', value: `Low (${inc.falsePositiveRisk.toFixed(2)})`, color: 'text-emerald-400' },
     { label: 'Satellite Pass', value: inc.sensor.satellite, color: 'text-slate-200' },
     { label: 'Acquisition Time', value: inc.sensor.passTime, color: 'text-slate-200' },
     { label: 'Processing Time', value: inc.sensor.processingTime, color: 'text-slate-200' },
@@ -62,10 +62,10 @@ export const DetectionPage: React.FC = () => {
   ];
 
   const evidencePoints = [
-    'Dark, smooth surface pattern in SAR (VV polarization) matches oil dielectric signature. Backscatter anomaly: −12.4 dB vs ocean background.',
+    'Dark, smooth SAR surface anomaly in VV polarization is consistent with an oil-slick signature and is supported by optical cross-validation. Backscatter anomaly: −9.2 dB vs ocean background.',
     'Optical cross-validation corroborates reduced NIR reflectance (Band 8: 0.04 vs ocean 0.14) consistent with hydrocarbon film.',
-    'Spill boundary confirmed by segmentation model (IoU 0.93 on validation set). No wind-slick or biogenic-film false positive indicators detected.',
-    'Spectral analysis shows crude oil signature consistent with API gravity 28-35°. Emulsion state: water-in-oil (mousse).',
+    'Spill boundary confirmed by segmentation model (IoU 0.93 on validation set). No major wind-slick or biogenic-film false-positive indicators detected.',
+    'Spectral characteristics are consistent with a petroleum-based hydrocarbon signature. Crude-oil classification is model-inferred and should be verified with field measurements.',
   ];
 
   return (

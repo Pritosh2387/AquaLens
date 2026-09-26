@@ -41,7 +41,7 @@ const IMAGE_TABS: ImageTab[] = [
 
 const TELEMETRY_ROWS = [
   { label: 'Satellite Mission',    value: 'Simulated SAR Backtest Input' },
-  { label: 'Scene Identifier',     value: 'HISTORICAL_WAKASHIO_BACKTEST' },
+  { label: 'Data Source (Backtest)', value: 'HISTORICAL_WAKASHIO_BACKTEST' },
   { label: 'Sensor Band / Freq',   value: 'C-Band (5.405 GHz)' },
   { label: 'Polarization Channel', value: 'VV + VH Dual-Pol' },
   { label: 'Pixel Resolution',     value: '10m × 10m Ground' },
@@ -54,7 +54,7 @@ const SPILL_CHARACTERISTICS = [
   { label: 'High Confidence Core', value: '18.3 km²' },
   { label: 'Spill Age (Est.)',     value: '48 - 72 Hours' },
   { label: 'Release Time (Est.)',  value: '2026-09-12 ~14:00 UTC' },
-  { label: 'Thickness Class',      value: 'Metallic / Dark / Sheen' },
+  { label: 'Surface State',        value: 'Oil film / sheen' },
 ];
 
 // ─── Fallback placeholder (image not found) ──────────────────────────────────
@@ -494,9 +494,9 @@ function ModalContent({
                       />
                     </div>
                     <p style={{ fontSize: 11, color: '#cbd5e1', lineHeight: 1.6 }}>
-                      High contrast dark feature detected with radar signal attenuation. Sharp boundaries confirm{' '}
-                      <span style={{ color: '#6ee7b7', fontWeight: 700 }}>mineral oil slick signature</span>{' '}
-                      over ocean clutter background.
+                      High-contrast dark feature detected with radar signal attenuation. Spatial boundaries and backscatter characteristics are consistent with a{' '}
+                      <span style={{ color: '#6ee7b7', fontWeight: 700 }}>potential oil-slick signature</span>{' '}
+                      over the ocean background.
                     </p>
                   </div>
                 </div>
@@ -510,7 +510,7 @@ function ModalContent({
                   }}
                 >
                   {[
-                    { label: 'Backscatter Δ', value: '−12.4 dB', color: '#fcd34d' },
+                    { label: 'Backscatter Δ', value: '−9.2 dB', color: '#fcd34d' },
                     { label: 'Model IoU',     value: '0.93',      color: '#67e8f9' },
                     { label: 'Confidence',    value: '94%',        color: '#6ee7b7' },
                   ].map((s) => (

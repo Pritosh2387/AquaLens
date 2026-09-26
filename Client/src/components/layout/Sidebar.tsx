@@ -50,13 +50,17 @@ export const Sidebar: React.FC = () => {
 
       {/* Active Incident Status Badge */}
       {!sidebarCollapsed && (
-        <div className="mx-2 mt-2 mb-0.5 px-2.5 py-2 rounded-lg bg-red-950/30 border border-red-500/30 font-mono">
+        <div className="mx-2 mt-2 mb-0.5 px-2.5 py-2 rounded-lg bg-red-950/30 border border-red-500/30 font-mono flex flex-col relative">
           <div className="flex items-center gap-1.5 mb-0.5">
             <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse shadow-[0_0_6px_#f87171]" />
             <span className="text-[9px] text-red-300 font-bold uppercase tracking-widest">Incident Active</span>
           </div>
           <div className="text-[10px] text-slate-200 font-bold">AQL-047</div>
           <div className="text-[9px] text-slate-400">Arabian Sea • HIGH PRIORITY</div>
+          
+          <div className="mt-2 inline-flex self-start px-1.5 py-0.5 rounded text-[8px] font-bold bg-amber-900/50 text-amber-400 border border-amber-500/50 uppercase tracking-widest">
+            SIMULATED INCIDENT
+          </div>
         </div>
       )}
 

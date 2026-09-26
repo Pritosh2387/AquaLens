@@ -6,12 +6,19 @@ import { DualRingSonarLens } from '../ui/DualRingSonarLens';
 export const ProvenanceFooter: React.FC = () => {
   return (
     <footer className="mt-8 pt-5 pb-6 px-5 rounded-2xl border-t-2 border-blue-500/50 border-x border-b border-blue-900/40 bg-gradient-to-r from-[#030919]/95 via-[#08183a]/95 to-[#040a1b]/95 backdrop-blur-2xl text-[11px] font-mono text-slate-300 flex flex-col md:flex-row items-center justify-between gap-3 shadow-[0_-8px_35px_rgba(37,99,235,0.25)]">
-      <div className="flex items-center gap-2 text-slate-200">
-        <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-        <span>
-          <strong className="text-white">OPERATIONAL DISCLAIMER:</strong> {DISCLAIMERS.SYNTHETIC}{' '}
-          {DISCLAIMERS.ATTRIBUTION}
-        </span>
+      <div className="flex items-start gap-3 text-slate-300 max-w-4xl">
+        <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+        <div className="leading-relaxed opacity-85">
+          <p className="font-bold text-amber-300 mb-1 tracking-wide">
+            SIMULATED INCIDENT • SYNTHETIC MOCK DATA
+          </p>
+          <p>
+            This interface is an operational software architecture prototype. Satellite measurements, incident metadata, model outputs and estimated quantities are synthetic/backtest data and are not certified scientific measurements.
+          </p>
+          <p className="mt-1">
+            Vessel attribution represents algorithmic candidate ranking based on AIS correlation and is not legal attribution.
+          </p>
+        </div>
       </div>
 
       <div className="flex items-center gap-4 shrink-0 text-slate-200">
