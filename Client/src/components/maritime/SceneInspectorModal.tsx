@@ -17,8 +17,8 @@ interface ImageTab {
 const IMAGE_TABS: ImageTab[] = [
   {
     id: 'sar_raw',
-    label: 'Raw Backscatter (VV)',
-    shortLabel: 'RAW VV',
+    label: 'SAR Context',
+    shortLabel: 'SAR CONTEXT',
     src: '/data/processed/sar_raw_vv.png',
     badge: 'SENTINEL-1 SAR',
     badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
@@ -49,11 +49,19 @@ const TELEMETRY_ROWS = [
   { label: 'Radar Damping',        value: '9.2 dB Damping' },
 ];
 
+const SPILL_CHARACTERISTICS = [
+  { label: 'Estimated Size',       value: '42.7 km² (Total Area)' },
+  { label: 'High Confidence Core', value: '18.3 km²' },
+  { label: 'Spill Age (Est.)',     value: '48 - 72 Hours' },
+  { label: 'Release Time (Est.)',  value: '2026-09-12 ~14:00 UTC' },
+  { label: 'Thickness Class',      value: 'Metallic / Dark / Sheen' },
+];
+
 // ─── Fallback placeholder (image not found) ──────────────────────────────────
 
 function ImagePlaceholder({ tab }: { tab: ImageTab }) {
   const cfg: Record<string, { icon: string; label: string }> = {
-    sar_raw: { icon: '📡', label: 'SAR RAW VV BACKSCATTER' },
+    sar_raw: { icon: '📡', label: 'SAR CONTEXT' },
     optical: { icon: '🛰️', label: 'SENTINEL-2 OPTICAL' },
   };
   const { icon, label } = cfg[tab.id] ?? cfg['sar_raw'];
@@ -401,11 +409,48 @@ function ModalContent({
                   style={{
                     display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
                     gap: 12, padding: '10px 0', fontSize: 11,
-                    borderBottom: i < TELEMETRY_ROWS.length - 1 ? '1px solid rgba(30,41,59,0.5)' : 'none',
+                    borderBottom: i < TELEMETRY_ROWS.length - 1 ? '1px solid rgba(30,41,59,0.5)' : '1px solid transparent',
                   }}
                 >
                   <span style={{ color: '#64748b', flexShrink: 0 }}>{row.label}</span>
                   <span style={{ color: '#f1f5f9', fontWeight: 700, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+                    {row.value}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Spill Characteristics Header */}
+            <div
+              style={{
+                padding: '16px 20px 12px',
+                borderTop: '1px solid rgba(30,41,59,0.6)',
+                borderBottom: '1px solid rgba(30,41,59,0.6)',
+                flexShrink: 0,
+                marginTop: '8px',
+                background: 'rgba(6,15,34,0.4)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Activity size={14} color="#f59e0b" />
+                <span style={{ fontSize: 10, fontWeight: 900, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.16em' }}>
+                  Spill Characteristics
+                </span>
+              </div>
+            </div>
+
+            <div style={{ padding: '4px 20px 0', flexShrink: 0 }}>
+              {SPILL_CHARACTERISTICS.map((row, i) => (
+                <div
+                  key={row.label}
+                  style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+                    gap: 12, padding: '10px 0', fontSize: 11,
+                    borderBottom: i < SPILL_CHARACTERISTICS.length - 1 ? '1px solid rgba(30,41,59,0.5)' : 'none',
+                  }}
+                >
+                  <span style={{ color: '#64748b', flexShrink: 0 }}>{row.label}</span>
+                  <span style={{ color: '#f59e0b', fontWeight: 700, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
                     {row.value}
                   </span>
                 </div>

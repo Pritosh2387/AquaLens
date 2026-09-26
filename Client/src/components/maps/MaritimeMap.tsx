@@ -361,13 +361,30 @@ export const MaritimeMap: React.FC<MaritimeMapProps> = ({
               fillColor: '#b45309',
               fillOpacity: 0.82,
               weight: 1.5,
+              className: !!onSpillClick ? 'spill-polygon-clickable' : '',
             }}
+            eventHandlers={
+              !!onSpillClick
+                ? {
+                    click: () => onSpillClick('AQL-047-CORE'),
+                    mouseover: (e) => {
+                      e.target.setStyle({ weight: 2.5, fillOpacity: 0.9, color: '#fcd34d' });
+                    },
+                    mouseout: (e) => {
+                      e.target.setStyle({ weight: 1.5, fillOpacity: 0.82, color: '#fbbf24' });
+                    },
+                  }
+                : undefined
+            }
           >
             <Popup>
               <div className="text-xs font-mono">
                 <p className="font-bold text-amber-300">HIGH CONFIDENCE CORE</p>
                 <p>Probability: 97%</p>
                 <p>Area: 18.3 km²</p>
+                {!!onSpillClick && (
+                  <p className="text-cyan-300 text-[10px] mt-1 italic">↗ Click core to open Scene Inspector</p>
+                )}
               </div>
             </Popup>
           </Polygon>
