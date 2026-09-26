@@ -38,6 +38,8 @@ interface CommandMapFrameProps {
   showTimeSlider?: boolean;
   className?: string;
   children?: React.ReactNode;
+  /** Callback fired when a spill polygon is clicked — opens the Scene Inspector */
+  onSpillClick?: (spillId: string) => void;
 }
 
 export const CommandMapFrame: React.FC<CommandMapFrameProps> = ({
@@ -70,6 +72,7 @@ export const CommandMapFrame: React.FC<CommandMapFrameProps> = ({
   showTimeSlider = false,
   className,
   children,
+  onSpillClick,
 }) => {
   const { center, zoom, layers: storeLayers } = useMapStore();
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -169,6 +172,7 @@ export const CommandMapFrame: React.FC<CommandMapFrameProps> = ({
               showCalloutLabels={showCalloutLabels}
               predictedPolygon={predictedPolygon}
               observedPolygon={observedPolygon}
+              onSpillClick={onSpillClick}
             />
           )}
         </div>

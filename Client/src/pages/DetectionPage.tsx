@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SectionHeader } from '../components/ui/SectionHeader';
 import { CrystallinePanel } from '../components/ui/CrystallinePanel';
 import { CommandMapFrame } from '../components/maps/CommandMapFrame';
@@ -11,6 +11,7 @@ import { usePipelineStore } from '../stores/pipelineStore';
 import { useIncidentStore } from '../stores/incidentStore';
 import { useRunPipeline } from '../hooks/usePipeline';
 import { CommandButton } from '../components/ui/CommandButton';
+import { SceneInspectorModal } from '../components/maritime/SceneInspectorModal';
 
 const SPECTRAL_DATA = [
   { wl: '0.4μm', oil: 12, water: 68, land: 42 },
@@ -29,6 +30,15 @@ export const DetectionPage: React.FC = () => {
   const { selectedSceneId, pipelineMode } = useIncidentStore();
   const runPipelineMutation = useRunPipeline();
   const inc = getDemoIncident(selectedSceneId);
+
+  // Scene Inspector Modal state
+  const [inspectorOpen, setInspectorOpen] = useState(false);
+  const [inspectorSpillId, setInspectorSpillId] = useState<string>('AQL-047');
+
+  const handleSpillClick = (spillId: string) => {
+    setInspectorSpillId(spillId);
+    setInspectorOpen(true);
+  };
 
   const handleRunPipeline = () => {
     runPipelineMutation.mutate({
@@ -128,6 +138,7 @@ export const DetectionPage: React.FC = () => {
             metocean={DEMO_METOCEAN}
             showCalloutLabels={true}
             height="460px"
+            onSpillClick={handleSpillClick}
           />
           {/* Detection overlay legend */}
           <div className="crystalline-panel p-2.5 rounded-lg text-[11px] flex flex-wrap items-center justify-between gap-3 text-slate-300">
@@ -266,6 +277,13 @@ export const DetectionPage: React.FC = () => {
         </CrystallinePanel>
       </div>
       </>)}
+
+      {/* ── Scene Inspector Modal ─────────────────────────────────────────── */}
+      <SceneInspectorModal
+        isOpen={inspectorOpen}
+        onClose={() => setInspectorOpen(false)}
+        spillId={inspectorSpillId}
+      />
     </div>
   );
 };

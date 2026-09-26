@@ -158,6 +158,8 @@ interface MaritimeMapProps {
   observedPolygon?: any | null;
   // Time
   timeOffset?: number;
+  // Scene Inspector callback — fired when a spill polygon is clicked
+  onSpillClick?: (spillId: string) => void;
 }
 
 // ─── Map Controller ──────────────────────────────────────────────────────────
@@ -222,6 +224,7 @@ export const MaritimeMap: React.FC<MaritimeMapProps> = ({
   predictedPolygon = null,
   observedPolygon = null,
   timeOffset = 0,
+  onSpillClick,
 }) => {
   const { center, zoom, layers, bounds, resetView, setBounds } = useMapStore();
 
@@ -307,6 +310,8 @@ export const MaritimeMap: React.FC<MaritimeMapProps> = ({
             const props = poly.properties ?? poly;
             const prob = props.mean_probability ?? 0.94;
             const area = props.area_km2;
+            const slickId = props.slick_id ?? 'AQL-047';
+            const isClickable = !!onSpillClick;
             return (
               <Polygon
                 key={`slick-${idx}`}
@@ -316,8 +321,21 @@ export const MaritimeMap: React.FC<MaritimeMapProps> = ({
                   fillColor: '#92400e',
                   fillOpacity: 0.62,
                   weight: 2.5,
-                  className: 'spill-polygon-animate',
+                  className: `spill-polygon-animate${isClickable ? ' spill-polygon-clickable' : ''}`,
                 }}
+                eventHandlers={
+                  isClickable
+                    ? {
+                        click: () => onSpillClick(slickId),
+                        mouseover: (e) => {
+                          e.target.setStyle({ weight: 3.5, fillOpacity: 0.78, color: '#fbbf24' });
+                        },
+                        mouseout: (e) => {
+                          e.target.setStyle({ weight: 2.5, fillOpacity: 0.62, color: '#f59e0b' });
+                        },
+                      }
+                    : undefined
+                }
               >
                 <Popup>
                   <div className="text-xs font-mono text-slate-200">
@@ -325,6 +343,9 @@ export const MaritimeMap: React.FC<MaritimeMapProps> = ({
                     <p>Probability: <span className="text-amber-300 font-bold">{(prob * 100).toFixed(0)}%</span></p>
                     {area && <p>Area: <span className="text-sky-300 font-bold">{area.toFixed(1)} km²</span></p>}
                     <p>Status: <span className="text-emerald-400 font-bold">CONFIRMED</span></p>
+                    {isClickable && (
+                      <p className="text-cyan-300 text-[10px] mt-1 italic">↗ Click polygon to open Scene Inspector</p>
+                    )}
                   </div>
                 </Popup>
               </Polygon>

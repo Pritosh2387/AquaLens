@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SectionHeader } from '../components/ui/SectionHeader';
 import { CrystallinePanel } from '../components/ui/CrystallinePanel';
 import { CommandMapFrame } from '../components/maps/CommandMapFrame';
@@ -36,6 +36,7 @@ import { DEMO_METOCEAN } from '../data/demoForecast';
 import { usePipelineStore } from '../stores/pipelineStore';
 import { useRunPipeline } from '../hooks/usePipeline';
 import { useIncidentStore } from '../stores/incidentStore';
+import { SceneInspectorModal } from '../components/maritime/SceneInspectorModal';
 
 export const OverviewPage: React.FC = () => {
   const navigate = useNavigate();
@@ -43,6 +44,15 @@ export const OverviewPage: React.FC = () => {
   const { selectedSceneId, pipelineMode } = useIncidentStore();
   const runPipelineMutation = useRunPipeline();
   const inc = getDemoIncident(selectedSceneId);
+
+  // Scene Inspector Modal state
+  const [inspectorOpen, setInspectorOpen] = useState(false);
+  const [inspectorSpillId, setInspectorSpillId] = useState<string>('AQL-047');
+
+  const handleSpillClick = (spillId: string) => {
+    setInspectorSpillId(spillId);
+    setInspectorOpen(true);
+  };
 
   const handleRunPipeline = () => {
     runPipelineMutation.mutate({
@@ -230,6 +240,7 @@ export const OverviewPage: React.FC = () => {
                 metocean={DEMO_METOCEAN}
                 showCalloutLabels={true}
                 height="460px"
+                onSpillClick={handleSpillClick}
               />
               {/* Map Legend Strip */}
               <div className="crystalline-panel p-2.5 rounded-lg text-[11px] flex flex-wrap items-center justify-between gap-3 text-slate-300">
@@ -394,6 +405,13 @@ export const OverviewPage: React.FC = () => {
           </div>
         </>
       )}
+
+      {/* ── Scene Inspector Modal ─────────────────────────────────────────── */}
+      <SceneInspectorModal
+        isOpen={inspectorOpen}
+        onClose={() => setInspectorOpen(false)}
+        spillId={inspectorSpillId}
+      />
     </div>
   );
 };

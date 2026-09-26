@@ -433,3 +433,37 @@
 .tabular-nums {
   font-variant-numeric: tabular-nums;
 }
+
+/* ── Scene Inspector Modal Animations ──────────────────────────────────────── */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.18s ease-out both;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Clickable spill polygon — show pointer cursor on hover */
+.spill-polygon-clickable {
+  cursor: pointer !important;
+}
+
+/* Leaflet path layer pointer cursor passthrough */
+.leaflet-interactive.spill-polygon-clickable {
+  cursor: pointer !important;
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

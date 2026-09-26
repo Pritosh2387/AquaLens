@@ -17,5 +17,11 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
+    fs: {
+      // Allow serving files from one level up to access Server/data/processed
+      allow: ['..'],
+    },
   },
+  // Expose Server/data/processed as /data/processed at build time
+  publicDir: 'public',
 })
