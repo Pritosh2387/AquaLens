@@ -252,7 +252,7 @@ python -m venv .venv
 source .venv/bin/activate
 
 # 3. Install Python dependencies
-cd backend
+cd Server
 pip install -r requirements.txt
 
 # 4. (Optional) Pre-generate mock data
@@ -266,7 +266,7 @@ All paths in `backend/configs/config.yaml` are relative to the `backend/` direct
 
 ```bash
 # From the repo root:
-cd frontend
+cd Client
 
 # 1. Install dependencies
 npm install
@@ -301,13 +301,13 @@ This launches both servers in separate terminal windows.
 
 **Backend (FastAPI):**
 ```bash
-cd backend
+cd Server
 python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 **Frontend (React + Vite):**
 ```bash
-cd frontend
+cd Client
 npm run dev
 ```
 
@@ -326,13 +326,13 @@ The demo script runs the pipeline directly without a web server.
 
 **Standard Demo — Modules 1-10:**
 ```bash
-cd backend
+cd Server
 python scripts/run_demo.py SCENE_001
 ```
 
 **Extended Demo — All 17 Modules:**
 ```bash
-cd backend
+cd Server
 python scripts/run_demo.py SCENE_001 --extended
 ```
 
@@ -360,7 +360,7 @@ PIPELINE COMPLETE - 17-MODULE EXTENDED DEMO SUMMARY
 
 **Other CLI Scripts:**
 ```bash
-cd backend
+cd Server
 python scripts/train_segmentation.py   # Train the U-Net model
 python scripts/run_inference.py SCENE_001
 python scripts/evaluate.py
