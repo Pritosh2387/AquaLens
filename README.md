@@ -241,8 +241,8 @@ SIH-26/                             # Monorepo root
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/Pritosh2387/SIH-26.git
-cd SIH-26
+git clone https://github.com/Pritosh2387/Aqualens.git
+cd Aqualens
 
 # 2. (Recommended) Create a virtual environment
 python -m venv .venv
