@@ -16,7 +16,7 @@ export const TopCommandBar: React.FC = () => {
     pipelineMode,
   } = useIncidentStore();
 
-  const { isPipelineRunning, runningModule } = usePipelineStore();
+  const { isPipelineRunning, runningModule, pipelineExecuted } = usePipelineStore();
   const { sidebarCollapsed, mobileMenuOpen, setMobileMenuOpen } = useUIStore();
   const runPipelineMutation = useRunPipeline();
 
@@ -82,18 +82,20 @@ export const TopCommandBar: React.FC = () => {
           {currentTime}
         </div>
 
-        {/* Scene Selector */}
-        <select
-          value={selectedSceneId}
-          onChange={(e) => setSceneId(e.target.value)}
-          className="bg-[#030814] border border-blue-500/40 text-sky-300 text-xs font-mono font-bold rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-sky-400 cursor-pointer shadow-inner hidden sm:block hover:border-sky-400/60 transition-colors"
-        >
-          {availableScenes.map((scene) => (
-            <option key={scene} value={scene}>
-              {scene}
-            </option>
-          ))}
-        </select>
+        {/* Scene Selector — only visible after pipeline has been run */}
+        {pipelineExecuted && (
+          <select
+            value={selectedSceneId}
+            onChange={(e) => setSceneId(e.target.value)}
+            className="bg-[#030814] border border-blue-500/40 text-sky-300 text-xs font-mono font-bold rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-sky-400 cursor-pointer shadow-inner hidden sm:block hover:border-sky-400/60 transition-colors"
+          >
+            {availableScenes.map((scene) => (
+              <option key={scene} value={scene}>
+                {scene}
+              </option>
+            ))}
+          </select>
+        )}
 
         {/* Run Pipeline Command Button */}
         <CommandButton

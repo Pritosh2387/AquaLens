@@ -176,33 +176,10 @@ export const AttributionPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Right: Search/filter + stats */}
-        <div className="space-y-4">
-          <CrystallinePanel title="Search & Filter" subtitle="Refine candidate list">
-            <div className="space-y-2">
-              <div className="relative">
-                <Search className="absolute left-2.5 top-2 w-3.5 h-3.5 text-slate-400" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search vessel or MMSI…"
-                  className="w-full bg-[#030814] border border-slate-700 rounded-lg pl-8 pr-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:border-sky-500 outline-none"
-                />
-              </div>
-              <div className="flex gap-1">
-                {(['ALL', 'HIGH_SCORE', 'DARK'] as const).map((f) => (
-                  <button
-                    key={f}
-                    onClick={() => setFilterType(f)}
-                    className={`flex-1 px-2 py-1 rounded text-[10px] font-bold transition-all cursor-pointer ${filterType === f ? 'bg-blue-600 text-white' : 'bg-[#030814] text-slate-400 border border-slate-700 hover:border-slate-600'}`}
-                  >
-                    {f === 'HIGH_SCORE' ? 'High Score' : f === 'DARK' ? 'Dark Vessel' : 'All'}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </CrystallinePanel>
+        {/* Right: flex column filling map height — small top spacer aligns Evidence with map legend line */}
+        <div className="flex flex-col gap-4" style={{ minHeight: '495px' }}>
+          {/* Small spacer nudges evidence up near the map legend bar */}
+          <div className="h-8" />
 
           <CrystallinePanel title="Evidence Summary" subtitle={inc.suspectedVessel}>
             <div className="space-y-2 text-[11px]">
@@ -223,8 +200,57 @@ export const AttributionPage: React.FC = () => {
               ))}
             </div>
           </CrystallinePanel>
+
+          {/* Flex spacer — pushes Search & Filter to the bottom */}
+          <div className="flex-1" />
+
+          {/* Bottom: Search & Filter pinned to bottom */}
+          <CrystallinePanel title="Search & Filter" subtitle="Refine candidate list">
+            <div className="space-y-2">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2 w-3.5 h-3.5 text-slate-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Vessel name or MMSI…"
+                  className="w-full bg-[#030814] border border-slate-700 rounded-lg pl-8 pr-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:border-sky-500 outline-none transition-colors"
+                />
+              </div>
+              <div className="flex gap-1">
+                {(['ALL', 'HIGH_SCORE', 'DARK'] as const).map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setFilterType(f)}
+                    className={`flex-1 px-2 py-1 rounded text-[10px] font-bold transition-all cursor-pointer ${
+                      filterType === f
+                        ? 'bg-blue-600 text-white shadow-[0_0_6px_rgba(37,99,235,0.4)]'
+                        : 'bg-[#030814] text-slate-400 border border-slate-700 hover:border-slate-500'
+                    }`}
+                  >
+                    {f === 'HIGH_SCORE' ? 'High Score' : f === 'DARK' ? 'Dark' : 'All'}
+                  </button>
+                ))}
+              </div>
+              {(searchQuery || filterType !== 'ALL') && (
+                <div className="flex items-center justify-between text-[10px]">
+                  <span className="text-slate-500">
+                    Showing <span className="text-sky-300 font-bold">{filtered.length}</span> of 5
+                  </span>
+                  <button
+                    onClick={() => { setSearchQuery(''); setFilterType('ALL'); }}
+                    className="text-slate-500 hover:text-sky-400 underline cursor-pointer transition-colors"
+                  >
+                    Clear
+                  </button>
+                </div>
+              )}
+            </div>
+          </CrystallinePanel>
         </div>
       </div>
+
+
 
       {/* Suspect Vessel Table */}
       <CrystallinePanel
@@ -242,22 +268,22 @@ export const AttributionPage: React.FC = () => {
             <thead>
               <tr className="border-b border-slate-800 text-slate-400 text-[10px] uppercase">
                 {[
-                  { key: 'rank', label: 'Rank' },
-                  { key: null, label: 'Vessel' },
-                  { key: null, label: 'Type' },
-                  { key: null, label: 'Flag' },
-                  { key: 'score', label: 'Attribution' },
-                  { key: null, label: 'AIS' },
-                  { key: null, label: 'SAR' },
-                  { key: null, label: 'Traj.' },
-                  { key: null, label: 'Dark' },
-                  { key: null, label: 'AIS Gap' },
-                  { key: null, label: 'Status' },
-                  { key: null, label: '' },
-                ].map(({ key, label }) => (
+                  { key: 'rank', label: 'Rank', id: 'col-rank' },
+                  { key: null, label: 'Vessel', id: 'col-vessel' },
+                  { key: null, label: 'Type', id: 'col-type' },
+                  { key: null, label: 'Flag', id: 'col-flag' },
+                  { key: 'score', label: 'Attribution', id: 'col-attribution' },
+                  { key: null, label: 'AIS', id: 'col-ais' },
+                  { key: null, label: 'SAR', id: 'col-sar' },
+                  { key: null, label: 'Traj.', id: 'col-traj' },
+                  { key: null, label: 'Dark', id: 'col-dark' },
+                  { key: null, label: 'AIS Gap', id: 'col-gap' },
+                  { key: null, label: 'Status', id: 'col-status' },
+                  { key: null, label: '', id: 'col-action' },
+                ].map(({ key, label, id }) => (
                   <th
-                    key={label || Math.random()}
-                    className={`pb-2 pr-4 text-left font-bold ${key ? 'cursor-pointer hover:text-sky-300' : ''}`}
+                    key={id}
+                    className={`pb-2 pr-4 text-left font-bold ${key ? 'cursor-pointer hover:text-sky-300 select-none' : ''}`}
                     onClick={key ? () => toggleSort(key as 'rank' | 'score') : undefined}
                   >
                     <span className="flex items-center gap-1">
@@ -269,63 +295,80 @@ export const AttributionPage: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((v) => (
-                <tr
-                  key={v.mmsi}
-                  onClick={() => setSelectedVessel(v as any)}
-                  className={`border-b border-slate-800/60 hover:bg-slate-800/30 cursor-pointer transition-colors ${v.rank === 1 ? 'bg-red-950/20' : ''}`}
-                >
-                  <td className="py-2.5 pr-4">
-                    <span className={`font-black text-sm ${v.rank === 1 ? 'text-red-400' : 'text-slate-300'}`}>
-                      #{v.rank}
-                    </span>
-                  </td>
-                  <td className="pr-4">
-                    <div className="font-bold text-slate-100">{v.vessel_name}</div>
-                    <div className="text-[9px] text-slate-500">MMSI: {v.mmsi}</div>
-                  </td>
-                  <td className="pr-4 text-slate-400">{v.vessel_type}</td>
-                  <td className="pr-4 text-slate-400">{v.flag}</td>
-                  <td className="pr-4">
-                    <div className={`font-black text-sm tabular-nums ${scoreColor(v.attribution_score)}`}>
-                      {(v.attribution_score * 100).toFixed(0)}%
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={12} className="py-8 text-center text-slate-500 text-[11px]">
+                    <div className="flex flex-col items-center gap-2">
+                      <Search className="w-5 h-5 text-slate-600" />
+                      <span>No vessels match the current filter.</span>
+                      <button
+                        onClick={() => { setSearchQuery(''); setFilterType('ALL'); }}
+                        className="text-sky-400 hover:text-sky-300 underline text-[10px] cursor-pointer"
+                      >
+                        Clear filters
+                      </button>
                     </div>
-                    <div className="w-16 h-1 bg-slate-800 rounded-full mt-0.5">
-                      <div
-                        className={`h-full rounded-full ${v.attribution_score > 0.7 ? 'bg-red-500' : v.attribution_score > 0.4 ? 'bg-amber-500' : 'bg-sky-500'}`}
-                        style={{ width: `${v.attribution_score * 100}%` }}
-                      />
-                    </div>
-                  </td>
-                  <td className={`pr-4 font-bold ${v.aisEvidence === 'Strong' ? 'text-emerald-400' : v.aisEvidence === 'Medium' ? 'text-amber-400' : 'text-slate-400'}`}>
-                    {v.aisEvidence}
-                  </td>
-                  <td className={`pr-4 font-bold ${v.sarEvidence === 'Strong' ? 'text-emerald-400' : v.sarEvidence === 'Medium' ? 'text-amber-400' : 'text-slate-400'}`}>
-                    {v.sarEvidence}
-                  </td>
-                  <td className={`pr-4 font-bold ${v.trajectory === 'High' ? 'text-emerald-400' : v.trajectory === 'Medium' ? 'text-amber-400' : 'text-slate-400'}`}>
-                    {v.trajectory}
-                  </td>
-                  <td className="pr-4">
-                    {v.isDark ? (
-                      <span className="px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 text-[9px] font-bold border border-purple-500/40">DARK</span>
-                    ) : (
-                      <span className="text-slate-500">—</span>
-                    )}
-                  </td>
-                  <td className={`pr-4 tabular-nums ${v.isDark ? 'text-amber-300' : 'text-slate-400'}`}>{v.aisGapDuration}</td>
-                  <td className="pr-4">
-                    <span className={`px-2 py-0.5 rounded text-[9px] font-bold border ${riskBadge(v.risk_level)}`}>
-                      {v.status}
-                    </span>
-                  </td>
-                  <td>
-                    <button className="text-sky-400 hover:text-sky-300 cursor-pointer">
-                      <Eye className="w-3.5 h-3.5" />
-                    </button>
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filtered.map((v) => (
+                  <tr
+                    key={v.mmsi}
+                    onClick={() => setSelectedVessel(v as any)}
+                    className={`border-b border-slate-800/60 hover:bg-slate-800/30 cursor-pointer transition-colors ${v.rank === 1 ? 'bg-red-950/20' : ''}`}
+                  >
+                    <td className="py-2.5 pr-4">
+                      <span className={`font-black text-sm ${v.rank === 1 ? 'text-red-400' : 'text-slate-300'}`}>
+                        #{v.rank}
+                      </span>
+                    </td>
+                    <td className="pr-4">
+                      <div className="font-bold text-slate-100">{v.vessel_name}</div>
+                      <div className="text-[9px] text-slate-500">MMSI: {v.mmsi}</div>
+                    </td>
+                    <td className="pr-4 text-slate-400">{v.vessel_type}</td>
+                    <td className="pr-4 text-slate-400">{v.flag}</td>
+                    <td className="pr-4">
+                      <div className={`font-black text-sm tabular-nums ${scoreColor(v.attribution_score)}`}>
+                        {(v.attribution_score * 100).toFixed(0)}%
+                      </div>
+                      <div className="w-16 h-1 bg-slate-800 rounded-full mt-0.5">
+                        <div
+                          className={`h-full rounded-full ${v.attribution_score > 0.7 ? 'bg-red-500' : v.attribution_score > 0.4 ? 'bg-amber-500' : 'bg-sky-500'}`}
+                          style={{ width: `${v.attribution_score * 100}%` }}
+                        />
+                      </div>
+                    </td>
+                    <td className={`pr-4 font-bold ${v.aisEvidence === 'Strong' ? 'text-emerald-400' : v.aisEvidence === 'Medium' ? 'text-amber-400' : 'text-slate-400'}`}>
+                      {v.aisEvidence}
+                    </td>
+                    <td className={`pr-4 font-bold ${v.sarEvidence === 'Strong' ? 'text-emerald-400' : v.sarEvidence === 'Medium' ? 'text-amber-400' : 'text-slate-400'}`}>
+                      {v.sarEvidence}
+                    </td>
+                    <td className={`pr-4 font-bold ${v.trajectory === 'High' ? 'text-emerald-400' : v.trajectory === 'Medium' ? 'text-amber-400' : 'text-slate-400'}`}>
+                      {v.trajectory}
+                    </td>
+                    <td className="pr-4">
+                      {v.isDark ? (
+                        <span className="px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 text-[9px] font-bold border border-purple-500/40">DARK</span>
+                      ) : (
+                        <span className="text-slate-500">—</span>
+                      )}
+                    </td>
+                    <td className={`pr-4 tabular-nums ${v.isDark ? 'text-amber-300' : 'text-slate-400'}`}>{v.aisGapDuration}</td>
+                    <td className="pr-4">
+                      <span className={`px-2 py-0.5 rounded text-[9px] font-bold border ${riskBadge(v.risk_level)}`}>
+                        {v.status}
+                      </span>
+                    </td>
+                    <td>
+                      <button className="text-sky-400 hover:text-sky-300 cursor-pointer">
+                        <Eye className="w-3.5 h-3.5" />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

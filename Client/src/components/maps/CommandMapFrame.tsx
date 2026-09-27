@@ -192,7 +192,7 @@ export const CommandMapFrame: React.FC<CommandMapFrameProps> = ({
 
           <div className="flex items-center gap-2">
             <span className="text-slate-500">BASEMAP:</span>
-            <span className="text-slate-300 font-medium">ESRI WORLD IMAGERY</span>
+            <span className="text-slate-300 font-medium">SATELLITE · TERRAIN</span>
           </div>
         </div>
       </div>

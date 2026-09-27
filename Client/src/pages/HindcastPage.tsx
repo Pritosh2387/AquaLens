@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { SectionHeader } from '../components/ui/SectionHeader';
 import { CrystallinePanel } from '../components/ui/CrystallinePanel';
 import { CommandMapFrame } from '../components/maps/CommandMapFrame';
-import { MapPin, Clock, Compass, History, Wind, Waves, Thermometer, ChevronRight, Play } from 'lucide-react';
+import { MapPin, Clock, Compass, History, Wind, Waves, Thermometer, ChevronRight, FlaskConical, Play } from 'lucide-react';
 import { getDemoIncident } from '../data/demoIncident';
 import {
   DEMO_ALL_SPILL_POLYGONS,
@@ -25,7 +25,6 @@ const HINDCAST_STEPS = [
 ];
 
 export const HindcastPage: React.FC = () => {
-  const [activeStep, setActiveStep] = useState(4);
   const { pipelineExecuted, isPipelineRunning } = usePipelineStore();
   const { selectedSceneId, pipelineMode } = useIncidentStore();
   const runPipelineMutation = useRunPipeline();
@@ -68,6 +67,13 @@ export const HindcastPage: React.FC = () => {
       sub: 'Lagrangian backward trajectory',
       color: 'emerald',
     },
+    {
+      icon: FlaskConical,
+      label: 'Spill Age',
+      value: '3.5 – 4.2 h',
+      sub: 'SAR NRCS · Early emulsification',
+      color: 'amber',
+    },
   ];
 
   const colorCls: Record<string, string> = {
@@ -75,6 +81,7 @@ export const HindcastPage: React.FC = () => {
     blue: 'bg-blue-500/15 border-blue-400/40 text-blue-300',
     purple: 'bg-purple-500/15 border-purple-400/40 text-purple-300',
     emerald: 'bg-emerald-500/15 border-emerald-400/40 text-emerald-300',
+    amber: 'bg-amber-500/15 border-amber-400/40 text-amber-300',
   };
 
   const metRows = [
@@ -112,7 +119,7 @@ export const HindcastPage: React.FC = () => {
       />
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {kpiCards.map((c) => {
           const Icon = c.icon;
           const cls = colorCls[c.color];
@@ -203,72 +210,6 @@ export const HindcastPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Bottom: Timeline + Uncertainty */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Hindcast Timeline */}
-        <CrystallinePanel title="Hindcast Timeline" subtitle="Step-by-step backward reconstruction">
-          <div className="p-4 bg-[#030814] rounded-lg border border-slate-800 space-y-4">
-            <div className="flex items-start justify-between gap-2">
-              {HINDCAST_STEPS.map((s, idx) => (
-                <div
-                  key={s.time}
-                  onClick={() => setActiveStep(idx)}
-                  className="flex flex-col items-center cursor-pointer group flex-1"
-                >
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[9px] transition-all text-center ${
-                      idx === activeStep
-                        ? 'bg-blue-600 text-white shadow-[0_0_12px_#38bdf8]'
-                        : 'bg-slate-800 text-slate-400 group-hover:bg-slate-700'
-                    }`}
-                  >
-                    {s.time}
-                  </div>
-                  <span className="text-[9px] text-slate-400 mt-1 text-center">{s.label}</span>
-                </div>
-              ))}
-            </div>
-            {/* Active step info */}
-            <div className="p-3 rounded bg-blue-950/30 border border-blue-500/30 text-[11px] space-y-1">
-              <div className="text-sky-300 font-bold">{HINDCAST_STEPS[activeStep].label}</div>
-              <div className="text-slate-300">{HINDCAST_STEPS[activeStep].desc}</div>
-              <div className="text-slate-400 tabular-nums">
-                Position: {HINDCAST_STEPS[activeStep].lat.toFixed(3)}° N, {HINDCAST_STEPS[activeStep].lon.toFixed(3)}° E
-              </div>
-            </div>
-          </div>
-        </CrystallinePanel>
-
-        {/* Uncertainty Over Time */}
-        <CrystallinePanel title="Uncertainty Over Time" subtitle="Origin probability vs backward drift hours">
-          <div className="p-3 bg-[#030814] rounded-lg border border-slate-800">
-            {/* Bar chart */}
-            <div className="flex items-end gap-2 h-28 border-b border-l border-slate-700 px-2 pb-1">
-              {[
-                { h: 3.8, conf: 87, label: 'T-0' },
-                { h: 5.1, conf: 78, label: 'T-1h' },
-                { h: 7.4, conf: 66, label: 'T-2h' },
-                { h: 10.2, conf: 55, label: 'T-3h' },
-                { h: 14.8, conf: 43, label: 'T-4h' },
-                { h: 22.3, conf: 31, label: 'T-6h' },
-                { h: 34.7, conf: 22, label: 'T-12h' },
-              ].map((d) => (
-                <div key={d.label} className="flex flex-col items-center flex-1 gap-0.5">
-                  <div className="text-[7px] text-sky-400 font-bold">{d.conf}%</div>
-                  <div
-                    className="w-full bg-gradient-to-t from-indigo-600/80 to-sky-400/60 rounded-t"
-                    style={{ height: `${(d.h / 35) * 90}%` }}
-                  />
-                  <span className="text-[7px] text-slate-500">{d.label}</span>
-                </div>
-              ))}
-            </div>
-            <div className="text-[10px] text-slate-400 mt-2 text-center">
-              Uncertainty radius expands from ±4.2 km (T-0) to ±34.7 km (T-12h)
-            </div>
-          </div>
-        </CrystallinePanel>
-      </div>
       </>)}
     </div>
   );

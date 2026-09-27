@@ -199,6 +199,29 @@ function formatCoord(lat: number, lon: number) {
 
 // ─── Main Component ──────────────────────────────────────────────────────────
 
+type MapStyle = 'satellite' | 'ocean' | 'terrain';
+
+const TILE_LAYERS: Record<MapStyle, { url: string; attribution: string; label: string; emoji: string }> = {
+  satellite: {
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    attribution: '&copy; Esri, Maxar, Earthstar Geographics',
+    label: 'SATELLITE',
+    emoji: '🛰',
+  },
+  ocean: {
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}',
+    attribution: '&copy; Esri, DeLorme, NaturalVue',
+    label: 'OCEAN',
+    emoji: '🌊',
+  },
+  terrain: {
+    url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; OpenStreetMap contributors, SRTM | &copy; OpenTopoMap',
+    label: 'TERRAIN',
+    emoji: '🗺',
+  },
+};
+
 export const MaritimeMap: React.FC<MaritimeMapProps> = ({
   interactive = true,
   showHUD = true,
@@ -227,6 +250,7 @@ export const MaritimeMap: React.FC<MaritimeMapProps> = ({
   onSpillClick,
 }) => {
   const { center, zoom, layers, bounds, resetView, setBounds } = useMapStore();
+  const [mapStyle, setMapStyle] = React.useState<MapStyle>('satellite');
 
   // Auto-fit to spill on mount
   const didAutoFit = React.useRef(false);
@@ -295,10 +319,11 @@ export const MaritimeMap: React.FC<MaritimeMapProps> = ({
       >
         <MapController center={center} zoom={zoom} bounds={bounds} />
 
-        {/* Dark Satellite Basemap */}
+        {/* Basemap — toggleable satellite / terrain */}
         <TileLayer
-          attribution="&copy; Esri, Maxar, Earthstar Geographics"
-          url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+          key={mapStyle}
+          attribution={TILE_LAYERS[mapStyle].attribution}
+          url={TILE_LAYERS[mapStyle].url}
           maxZoom={19}
         />
 
@@ -803,6 +828,33 @@ export const MaritimeMap: React.FC<MaritimeMapProps> = ({
               <Maximize2 className="w-3 h-3" />
               <span>FIT</span>
             </button>
+          </div>
+
+          {/* Top-Right: Map Style Toggle */}
+          <div className="absolute top-4 right-4 z-[400] flex rounded-lg overflow-hidden border border-slate-700/80 shadow-xl font-mono text-[10px]">
+            {(['satellite', 'ocean', 'terrain'] as MapStyle[]).map((style) => {
+              const active = mapStyle === style;
+              const activeClass =
+                style === 'satellite'
+                  ? 'bg-sky-600/85 text-white shadow-[0_0_10px_rgba(14,165,233,0.55)]'
+                  : style === 'ocean'
+                  ? 'bg-cyan-700/85 text-white shadow-[0_0_10px_rgba(6,182,212,0.55)]'
+                  : 'bg-emerald-700/85 text-white shadow-[0_0_10px_rgba(16,185,129,0.55)]';
+              return (
+                <button
+                  key={style}
+                  onClick={() => setMapStyle(style)}
+                  className={cn(
+                    'px-3 py-1.5 font-bold tracking-wider transition-all duration-200 flex items-center gap-1.5 border-r border-slate-700/60 last:border-r-0',
+                    active ? activeClass : 'bg-[#040915]/90 text-slate-400 hover:text-slate-200 hover:bg-slate-800/70',
+                  )}
+                  title={TILE_LAYERS[style].label}
+                >
+                  <span>{TILE_LAYERS[style].emoji}</span>
+                  <span>{TILE_LAYERS[style].label}</span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Time offset banner */}
