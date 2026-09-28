@@ -563,10 +563,6 @@ export const WhatIfPage: React.FC = () => {
                 );
               })}
             </div>
-
-            <p className="text-[9px] text-slate-600 italic border-t border-slate-800 pt-2">
-              ⚠ {simResult.disclaimer}
-            </p>
           </div>
         </CrystallinePanel>
       )}
