@@ -4,6 +4,7 @@ import { CrystallinePanel } from '../components/ui/CrystallinePanel';
 import {
   TrendingDown, TrendingUp, AlertTriangle, CheckCircle2,
   Minus, Play, Sliders, Zap, RefreshCw, ChevronRight,
+  Ship, Anchor, Waves, FlaskConical, Clock,
 } from 'lucide-react';
 import { DEMO_INCIDENT } from '../data/demoIncident';
 import { DEMO_WHATIF_SCENARIOS } from '../data/demoResources';
@@ -205,15 +206,15 @@ interface ResourceDef {
   step: number;
   color: string;
   trackColor: string;
-  icon: string;
+  icon: React.ReactNode;
 }
 
 const RESOURCE_DEFS: ResourceDef[] = [
-  { key: 'skimmers',  label: 'Skimmers',           unit: 'units', min: 0, max: 8,  step: 1,   color: '#38bdf8', trackColor: 'rgba(56,189,248,0.22)',  icon: '🚢' },
-  { key: 'booms',     label: 'Containment Booms',  unit: 'units', min: 0, max: 10, step: 1,   color: '#f59e0b', trackColor: 'rgba(245,158,11,0.22)',   icon: '⛽' },
-  { key: 'ships',     label: 'Response Ships',      unit: 'units', min: 0, max: 5,  step: 1,   color: '#818cf8', trackColor: 'rgba(129,140,248,0.22)',  icon: '🛥️' },
-  { key: 'dispersal', label: 'Chemical Dispersal', unit: 'units', min: 0, max: 4,  step: 1,   color: '#34d399', trackColor: 'rgba(52,211,153,0.22)',   icon: '🧪' },
-  { key: 'delay',     label: 'Response Delay',     unit: 'hours', min: 0, max: 24, step: 0.5, color: '#f87171', trackColor: 'rgba(248,113,113,0.22)',  icon: '⏱️' },
+  { key: 'skimmers',  label: 'Skimmers',           unit: 'units', min: 0, max: 8,  step: 1,   color: '#38bdf8', trackColor: 'rgba(56,189,248,0.22)',  icon: <Ship       className="w-3.5 h-3.5" style={{ color: '#38bdf8' }} /> },
+  { key: 'booms',     label: 'Containment Booms',  unit: 'units', min: 0, max: 10, step: 1,   color: '#f59e0b', trackColor: 'rgba(245,158,11,0.22)',   icon: <Anchor     className="w-3.5 h-3.5" style={{ color: '#f59e0b' }} /> },
+  { key: 'ships',     label: 'Response Ships',      unit: 'units', min: 0, max: 5,  step: 1,   color: '#818cf8', trackColor: 'rgba(129,140,248,0.22)',  icon: <Waves      className="w-3.5 h-3.5" style={{ color: '#818cf8' }} /> },
+  { key: 'dispersal', label: 'Chemical Dispersal', unit: 'units', min: 0, max: 4,  step: 1,   color: '#34d399', trackColor: 'rgba(52,211,153,0.22)',   icon: <FlaskConical className="w-3.5 h-3.5" style={{ color: '#34d399' }} /> },
+  { key: 'delay',     label: 'Response Delay',     unit: 'hours', min: 0, max: 24, step: 0.5, color: '#f87171', trackColor: 'rgba(248,113,113,0.22)',  icon: <Clock      className="w-3.5 h-3.5" style={{ color: '#f87171' }} /> },
 ];
 
 const DEFAULT_SLIDERS: SliderValues = { skimmers: 2, booms: 3, ships: 1, dispersal: 1, delay: 0 };
@@ -347,13 +348,7 @@ export const WhatIfPage: React.FC = () => {
       {/* ── Resource Slider Panel ─────────────────────────────────────────── */}
       <CrystallinePanel
         title="Resource Simulator"
-        subtitle="Adjust deployment parameters · every slider combination produces hardcoded simulation results"
-        headerAction={
-          <div className="flex items-center gap-1.5">
-            <Sliders className="w-3.5 h-3.5 text-sky-400" />
-            <span className="text-[10px] text-sky-400 font-bold uppercase tracking-wider">Offline Engine</span>
-          </div>
-        }
+        subtitle="Adjust deployment parameters · every slider combination produces instant simulation results"
       >
         <div className="space-y-5">
 
@@ -381,7 +376,7 @@ export const WhatIfPage: React.FC = () => {
                 <div key={def.key} className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-sm leading-none">{def.icon}</span>
+                      <span className="flex items-center leading-none">{def.icon}</span>
                       <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: def.color }}>
                         {def.label}
                       </span>

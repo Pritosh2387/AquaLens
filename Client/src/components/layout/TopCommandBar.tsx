@@ -44,7 +44,7 @@ export const TopCommandBar: React.FC = () => {
         sidebarCollapsed ? 'left-16' : 'left-0 md:left-64'
       )}
     >
-      {/* Left Section: Mobile Menu Trigger */}
+      {/* Left Section: Mobile Menu Trigger + AI FOR OCEANS Branding */}
       <div className="flex items-center gap-3">
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -53,20 +53,18 @@ export const TopCommandBar: React.FC = () => {
         >
           <Menu className="w-5 h-5" />
         </button>
-      </div>
-
-      {/* Center Text Headline: AI FOR OCEANS */}
-      <div className="flex flex-col items-center justify-center mx-auto text-center pointer-events-none select-none">
-        <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-sky-400 animate-pulse hidden sm:inline-block" />
-          <span className="font-mono font-black text-base sm:text-lg md:text-xl tracking-[0.3em] text-transparent bg-clip-text bg-gradient-to-r from-sky-200 via-sky-400 to-blue-400 drop-shadow-[0_0_14px_rgba(56,189,248,0.85)] uppercase">
-            AI FOR OCEANS
+        <div className="flex flex-col pointer-events-none select-none">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-sky-400 animate-pulse hidden sm:inline-block" />
+            <span className="font-mono font-black text-base sm:text-lg md:text-xl tracking-[0.3em] text-transparent bg-clip-text bg-gradient-to-r from-sky-200 via-sky-400 to-blue-400 drop-shadow-[0_0_14px_rgba(56,189,248,0.85)] uppercase">
+              AI FOR OCEANS
+            </span>
+            <Waves className="w-4 h-4 text-sky-400 animate-pulse hidden sm:inline-block" />
+          </div>
+          <span className="text-[9px] font-mono text-sky-300/80 font-bold tracking-[0.22em] uppercase hidden sm:block -mt-0.5">
+            Predictive Maritime Intelligence Engine
           </span>
-          <Waves className="w-4 h-4 text-sky-400 animate-pulse hidden sm:inline-block" />
         </div>
-        <span className="text-[9px] font-mono text-sky-300/80 font-bold tracking-[0.22em] uppercase hidden sm:block -mt-0.5">
-          Predictive Maritime Intelligence Engine
-        </span>
       </div>
 
       {/* Right Controls: Live Dot, UTC Time, Scene Selector & Execute */}
