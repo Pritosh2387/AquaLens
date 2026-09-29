@@ -7,6 +7,7 @@
 ![Tests](https://img.shields.io/badge/tests-243%20passed-brightgreen)
 ![Mode](https://img.shields.io/badge/data-MOCK%20only-orange)
 ![License](https://img.shields.io/badge/license-MIT-blue)
+
 A full-stack, 17-module ML/AI pipeline prototype for satellite-based oil spill monitoring. The system processes synthetic SAR and optical satellite scenes end-to-end — from raw pixel detection through vessel attribution, spill forecasting, uncertainty quantification, response planning, explainability, and rule-based action recommendation — all exposed via a production-ready **FastAPI** REST interface and visualised through a **React + Vite** maritime command centre dashboard.
 
 > [!WARNING]
