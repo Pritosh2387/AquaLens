@@ -16,7 +16,7 @@ from typing import Any, Dict, List, Optional
 
 from src.utils.logging import get_logger
 from src.utils.config import load_config
-from src.resource_optimization.allocator import ResourceOptimizer
+from src.resource_optimization.or_tools_optimizer import ORToolsResourceOptimizer
 
 logger = get_logger("WhatIfSimulator")
 
@@ -46,7 +46,7 @@ class WhatIfSimulator:
 
     def __init__(self, config_path: str = "configs/config.yaml"):
         self.cfg = load_config(config_path)
-        self.optimizer = ResourceOptimizer(config_path)
+        self.optimizer = ORToolsResourceOptimizer(config_path)
 
     def simulate(
         self,

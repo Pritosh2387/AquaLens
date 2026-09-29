@@ -574,6 +574,34 @@ class Module13Response(BaseModel):
     disclaimer: str
 
 
+class Module13ORToolsResponse(BaseModel):
+    """
+    Response for the OR-Tools CP-SAT resource optimization endpoint.
+
+    Extends Module13Response with solver metadata:
+      - solver_status: CP-SAT status (OPTIMAL, FEASIBLE, INFEASIBLE_OR_EMPTY)
+      - solver_wall_time_seconds: actual solve time in seconds
+    """
+    scene_id: str
+    data_type: str = "SIMULATED"
+    optimization_method: str
+    solver_status: str = Field(
+        description="OR-Tools CP-SAT solver status: OPTIMAL, FEASIBLE, or INFEASIBLE_OR_EMPTY.",
+        examples=["OPTIMAL"],
+    )
+    solver_wall_time_seconds: float = Field(
+        description="Wall-clock time (seconds) taken by the CP-SAT solver.",
+        examples=[0.012],
+    )
+    total_resources_available: int
+    total_resources_deployed: int
+    assets_targeted: int
+    estimated_coverage_fraction: float
+    allocations: List[ResourceAllocation]
+    unallocated_resources: List[UnallocatedResource]
+    disclaimer: str
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Module 14 — What-If Response Simulation
 # ──────────────────────────────────────────────────────────────────────────────

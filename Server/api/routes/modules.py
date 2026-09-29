@@ -43,7 +43,8 @@ from api.schemas import (
 from api.pipeline_service import (
     run_module1, run_module2, run_module3, run_module4, run_module5,
     run_module6, run_module7, run_module8, run_module9, run_module10,
-    run_module11, run_module12, run_module13, run_module14, run_module15,
+    run_module11, run_module12, run_module13,
+    run_module14, run_module15,
     run_module16, run_module17,
 )
 
@@ -295,11 +296,14 @@ def module12_priority(req: Module12Request):
 @router.post(
     "/13/optimize",
     response_model=Module13Response,
-    summary="Module 13 — Resource Optimization [SIMULATED]",
+    summary="Module 13 — Resource Optimization via Google OR-Tools CP-SAT [SIMULATED]",
     description=(
         "Allocates mock response resources (skimmers, booms, vessels, drones, aircraft) "
-        "to impact targets using a transparent greedy priority-weighted algorithm. "
-        "Objective: maximize coverage of high-impact assets within resource constraints. "
+        "to impact targets using **Google OR-Tools CP-SAT** — an exact integer programming solver. "
+        "Objective: maximise the sum of weighted asset-impact scores covered, subject to: "
+        "(1) each resource unit used at most once, "
+        "(2) a configurable max-resources-per-target cap, "
+        "(3) a feasibility horizon gate (units that cannot arrive in time are excluded). "
         "All fleet data is synthetic mock data. Results are labelled SIMULATED."
     ),
     tags=["Modules"],

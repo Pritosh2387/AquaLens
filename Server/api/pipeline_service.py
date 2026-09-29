@@ -35,7 +35,7 @@ from src.uncertainty.impact import UncertaintyEngine
 # Modules 11–15 — new engines
 from src.impact.scoring import ImpactEngine
 from src.priority.scoring import PriorityEngine
-from src.resource_optimization.allocator import ResourceOptimizer
+from src.resource_optimization.or_tools_optimizer import ORToolsResourceOptimizer
 from src.whatif.simulator import WhatIfSimulator
 from src.feedback.comparator import FeedbackComparator
 
@@ -755,6 +755,14 @@ def run_module12(scene_id: str, config_path: str) -> dict:
 # ──────────────────────────────────────────────────────────────────────────────
 
 def run_module13(scene_id: str, config_path: str, resource_override=None) -> dict:
+    """
+    Module 13 — Resource Optimization using Google OR-Tools CP-SAT.
+
+    Runs the full M1→M11 upstream pipeline, then solves the resource
+    assignment problem with an exact CP-SAT integer-programming solver
+    (maximise weighted asset coverage subject to fleet and feasibility
+    constraints). The greedy heuristic has been retired.
+    """
     cfg = load_config(config_path)
     _ensure_mock_data(cfg, scene_id, config_path)
 
@@ -765,7 +773,7 @@ def run_module13(scene_id: str, config_path: str, resource_override=None) -> dic
     impact_engine = ImpactEngine(config_path)
     mod11 = impact_engine.evaluate_impact(mod2=mod2, mod4=mod4, mod10=mod10, ocean_data=ocean_data)
 
-    optimizer = ResourceOptimizer(config_path)
+    optimizer = ORToolsResourceOptimizer(config_path)
     result = optimizer.allocate(
         mod11=mod11,
         mod9=mod9,
@@ -778,6 +786,7 @@ def run_module13(scene_id: str, config_path: str, resource_override=None) -> dic
         "data_type": "SIMULATED",
         **result,
     })
+
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Module 14 — What-If Response Simulation
