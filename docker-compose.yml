@@ -1,15 +1,4 @@
-# ============================================================
-# AquaLens — docker-compose.yml  (DUMMY / PLACEHOLDER)
-# ============================================================
-# NOTE: This is a placeholder file. The project currently runs
-# in development mode only. Docker support is not yet active.
-# Do NOT use this in production without proper configuration.
-#
-# Usage (when ready):
-#   docker compose up --build
-#   docker compose down
-# ============================================================
-
+# AquaLens — docker-compose.yml  
 version: "3.9"
 
 services:
@@ -58,12 +47,12 @@ services:
     networks:
       - aqualens-net
 
-# ── Named volumes ─────────────────────────────────────────────
+# Named volumes 
 volumes:
   backend-data:
     driver: local
 
-# ── Networks ──────────────────────────────────────────────────
+#Network
 networks:
   aqualens-net:
     driver: bridge
