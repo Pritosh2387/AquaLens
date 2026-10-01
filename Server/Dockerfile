@@ -1,11 +1,3 @@
-# ============================================================
-# AquaLens — Backend Dockerfile  (DUMMY / PLACEHOLDER)
-# ============================================================
-# NOTE: This is a placeholder file. The project currently runs
-# in development mode only. Docker support is not yet active.
-# Do NOT use this in production without proper configuration.
-# ============================================================
-
 # ── Stage 1: base ───────────────────────────────────────────
 FROM python:3.10-slim AS base
 

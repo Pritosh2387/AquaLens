@@ -1,10 +1,4 @@
-# ============================================================
-# AquaLens — Frontend Dockerfile  (DUMMY / PLACEHOLDER)
-# ============================================================
-# NOTE: This is a placeholder file. The project currently runs
-# in development mode only. Docker support is not yet active.
-# Do NOT use this in production without proper configuration.
-# ============================================================
+
 
 # ── Stage 1: build ──────────────────────────────────────────
 FROM node:20-alpine AS build
