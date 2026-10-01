@@ -24,17 +24,18 @@ A full-stack, 17-module ML/AI pipeline prototype for satellite-based oil spill m
 3. [Architecture & Data Flow](#3-architecture--data-flow)
 4. [Project Structure](#4-project-structure)
 5. [Tech Stack](#5-tech-stack)
-6. [Installation](#6-installation)
-7. [Running Locally](#7-running-locally)
-8. [REST API](#8-rest-api)
-9. [Pipeline Modes](#9-pipeline-modes)
-10. [Per-Module API Reference](#10-per-module-api-reference)
-11. [Decision Support: M16 & M17](#11-decision-support-m16--m17)
-12. [Data Provenance System](#12-data-provenance-system)
-13. [Configuration Reference](#13-configuration-reference)
-14. [Testing](#14-testing)
-15. [Integrating Real Data](#15-integrating-real-data)
-16. [Disclaimers](#16-disclaimers)
+6. [Docker](#6-docker)
+7. [Installation](#7-installation)
+8. [Running Locally](#8-running-locally)
+9. [REST API](#9-rest-api)
+10. [Pipeline Modes](#10-pipeline-modes)
+11. [Per-Module API Reference](#11-per-module-api-reference)
+12. [Decision Support: M16 & M17](#12-decision-support-m16--m17)
+13. [Data Provenance System](#13-data-provenance-system)
+14. [Configuration Reference](#14-configuration-reference)
+15. [Testing](#15-testing)
+16. [Integrating Real Data](#16-integrating-real-data)
+17. [Disclaimers](#17-disclaimers)
 
 ---
 
@@ -185,10 +186,13 @@ flowchart TD
 AquaLens/                           # Monorepo root
 ├── .gitignore
 ├── README.md
+├── docker-compose.yml              # Orchestrates backend + frontend containers [placeholder]
 │
 ├── Server/                         # FastAPI Python backend
 │   ├── main.py                     # FastAPI app bootstrap, CORS, router mounting
 │   ├── requirements.txt
+│   ├── Dockerfile                  # Backend container image — Python 3.10-slim, multi-stage [placeholder]
+│   ├── .dockerignore               # Excludes __pycache__, .venv, data dirs, model weights
 │   │
 │   ├── api/
 │   │   ├── routes/
@@ -315,6 +319,8 @@ AquaLens/                           # Monorepo root
     ├── vite.config.ts
     ├── tsconfig.json
     ├── index.html
+    ├── Dockerfile                  # Frontend container — Node 20 build + Nginx serve [placeholder]
+    ├── .dockerignore               # Excludes node_modules, dist, .env files
     │
     ├── public/
     │   └── assets/                 # Static map overlays and satellite imagery
@@ -440,7 +446,53 @@ AquaLens/                           # Monorepo root
 
 ---
 
-## 6. Installation
+## 6. Docker
+
+> [!NOTE]
+> The Docker files are **placeholder / dummy** configurations. The project currently runs in development mode only. These are not production-ready and require proper secrets management, volume configuration, and domain setup before any deployment.
+
+Three files are provided as a starting point:
+
+| File | Purpose |
+|---|---|
+| [`docker-compose.yml`](docker-compose.yml) | Orchestrates both services — backend on `:8000`, frontend on `:80` |
+| [`Server/Dockerfile`](Server/Dockerfile) | Multi-stage Python 3.10-slim image — installs deps, copies source, exposes 8000 |
+| [`Client/Dockerfile`](Client/Dockerfile) | Node 20 Alpine build stage → Nginx Alpine serve stage (SPA routing + API proxy) |
+
+### Quick Start (when ready)
+
+```bash
+# Build and start both containers
+docker compose up --build
+
+# Run backend only
+docker compose up backend
+
+# Stop all containers
+docker compose down
+
+# Stop and remove volumes
+docker compose down -v
+```
+
+### Environment Variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `CORS_ORIGINS` | `http://localhost,http://localhost:80` | Comma-separated allowed origins for FastAPI CORS |
+| `VITE_API_BASE_URL` | `http://localhost:8000` | Backend URL injected at frontend build time (`--build-arg`) |
+
+### Service URLs (Docker)
+
+| Service | URL |
+|---|---|
+| Frontend | http://localhost |
+| Backend Swagger UI | http://localhost:8000/docs |
+| Health Check | http://localhost:8000/api/v1/health |
+
+---
+
+## 7. Installation
 
 ### Requirements
 
@@ -494,7 +546,7 @@ npm run dev
 
 ---
 
-## 7. Running Locally
+## 8. Running Locally
 
 ### Manual Start
 
@@ -568,7 +620,7 @@ python -m pytest tests/ -v             # Full 243-test suite
 
 ---
 
-## 8. REST API
+## 9. REST API
 
 Start the backend server, then navigate to `http://localhost:8000/docs` for the interactive Swagger UI.
 
@@ -607,7 +659,7 @@ Start the backend server, then navigate to `http://localhost:8000/docs` for the 
 
 ---
 
-## 9. Pipeline Modes
+## 10. Pipeline Modes
 
 The `/api/v1/pipeline/run` endpoint supports three execution modes.
 
@@ -647,7 +699,7 @@ Also runs the Evidence Graph and Action Recommendation.
 
 ---
 
-## 10. Per-Module API Reference
+## 11. Per-Module API Reference
 
 ### Module 13 — Resource Optimization (OR-Tools CP-SAT)
 
@@ -725,7 +777,7 @@ Response includes: `iou_score`, `centroid_error_km`, `area_error_km2`, `recalibr
 
 ---
 
-## 11. Decision Support: M16 & M17
+## 12. Decision Support: M16 & M17
 
 ### Module 16 — Evidence Graph / Explainability
 
@@ -787,7 +839,7 @@ Full response structure:
 
 ---
 
-## 12. Data Provenance System
+## 13. Data Provenance System
 
 Every module output carries a provenance label. Labels are never downgraded (SIMULATED data is never relabelled as OBSERVED).
 
@@ -803,7 +855,7 @@ The evidence graph (M16) uses these labels per-node to make the provenance chain
 
 ---
 
-## 13. Configuration Reference
+## 14. Configuration Reference
 
 All system behaviour is controlled by `Server/configs/config.yaml`. Key sections:
 
@@ -852,7 +904,7 @@ action_recommendation:
 
 ---
 
-## 14. Testing
+## 15. Testing
 
 The repository includes **243 fully automated tests** across 11 test files covering all 17 modules.
 
@@ -901,7 +953,7 @@ python -m pytest --collect-only -q
 
 ---
 
-## 15. Integrating Real Data
+## 16. Integrating Real Data
 
 The mock generators in `Server/src/mock_data/` must be replaced with real operational data sources for production use:
 
@@ -919,7 +971,7 @@ All thresholds in `Server/configs/config.yaml` require calibration by domain exp
 
 ---
 
-## 16. Disclaimers
+## 17. Disclaimers
 
 - **No scientific validity.** All outputs are generated from synthetic data. No module has been validated against real satellite observations.
 - **No legal attribution.** Vessel rankings (M8) and investigation recommendations (M17) are based on circumstantial evidence patterns. They do not constitute legal evidence, establish causation, or support enforcement action.
