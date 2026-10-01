@@ -1,0 +1,35 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Data directories (large, auto-generated)
+data/mock/
+data/raw/
+data/processed/
+
+# Model weights (large binaries)
+*.pth
+*.pt
+*.onnx
+
+# Logs
+*.log
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

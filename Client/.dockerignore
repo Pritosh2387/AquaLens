@@ -1,0 +1,26 @@
+# Node dependencies (reinstalled inside container)
+node_modules/
+
+# Build output (rebuilt inside container)
+dist/
+
+# Environment files (injected via build args)
+.env
+.env.local
+.env.*.local
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
