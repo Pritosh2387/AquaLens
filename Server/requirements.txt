@@ -10,7 +10,7 @@ torch>=2.0.0
 scikit-learn>=1.7.0
 xgboost>=3.0.0
 
-# Combinatorial optimisation (Module 13 — CP-SAT resource allocation)
+# Combinatorial optimisation (Module 13 - CP-SAT resource allocation)
 ortools>=9.8.0
 
 # Image processing

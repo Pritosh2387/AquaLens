@@ -83,48 +83,93 @@ The system chains 17 independent, testable modules across three operational phas
 
 ## 3. Architecture & Data Flow
 
-```
-SAR + Optical Imagery
-        |
-        v
-+---------------------------------------------------+
-|  PHASE 1: DETECTION & PROCESSING                  |
-|                                                   |
-|  M1 Data Processing ---> M2 Spill Detection       |
-|         |                      |                  |
-|         +-----------> M3 Sensor Fusion            |
-|                             |                     |
-|                        M4 Oil Confidence          |
-|                                                   |
-|  M1 -----------------> M5 Ship Detection          |
-+---------------------------------------------------+
-        |
-        v
-+---------------------------------------------------+
-|  PHASE 2: ATTRIBUTION & FORECAST                  |
-|                                                   |
-|  M5 ---> M6 AIS Anomaly                           |
-|  M2 ---> M7 Hindcast Origin                       |
-|  M6 + M7 ---> M8 Vessel Attribution [INFERRED]    |
-|                                                   |
-|  M2 ---> M9 Forward Forecast       [SIMULATED]    |
-|  M9 ---> M10 Uncertainty / MC      [SIMULATED]    |
-+---------------------------------------------------+
-        |
-        v
-+---------------------------------------------------+
-|  PHASE 3: RESPONSE & DECISION SUPPORT             |
-|                                                   |
-|  M10 ---> M11 Impact Prediction    [SIMULATED]    |
-|  M11 ---> M12 Priority Scoring     [SIMULATED]    |
-|  M11 ---> M13 Resource Optimizer   [SIMULATED]    |
-|                                                   |
-|  M13 --> M14 What-If Sim   [STANDALONE/SIMULATED] |
-|  M9  --> M15 Pred Feedback [STANDALONE/FEEDBACK]  |
-|                                                   |
-|  M2-M13 --> M16 Evidence Graph      [SIMULATED]   |
-|  M16    --> M17 Action Recommender  [SIMULATED]   |
-+---------------------------------------------------+
+```mermaid
+flowchart TD
+    SAR["🛰️ SAR + Optical Imagery"]
+
+    subgraph P1["⚡ PHASE 1 — Detection & Processing  [OBSERVED]"]
+        direction TB
+        M1["M1\nData Processing\n& Feature Extraction"]
+        M2["M2\nOil Spill Detection\nU-Net Segmentation"]
+        M3["M3\nSensor Fusion\nSAR + Optical"]
+        M4["M4\nOil Confidence\n& Look-Alike Filter"]
+        M5["M5\nShip Detection\nCFAR"]
+    end
+
+    subgraph P2["🔍 PHASE 2 — Attribution & Forecast  [INFERRED / SIMULATED]"]
+        direction TB
+        M6["M6\nAIS Anomaly\n& Dark Vessel Flagging"]
+        M7["M7\nHindcast Origin\nBackward Particle"]
+        M8["M8\nVessel Attribution\nEvidence Ranking"]
+        M9["M9\nSpill Forecast\nForward Particle Drift"]
+        M10["M10\nUncertainty\nMonte Carlo"]
+    end
+
+    subgraph P3["🚨 PHASE 3 — Response & Decision Support  [SIMULATED]"]
+        direction TB
+        M11["M11\nImpact Prediction\nAsset Threat Scoring"]
+        M12["M12\nPriority Scoring\n0–100 Urgency"]
+        M13["M13\nResource Optimization\nOR-Tools CP-SAT"]
+        M16["M16\nEvidence Graph\nExplainability"]
+        M17["M17\nAction Recommendation\nRule-Based"]
+    end
+
+    subgraph SA["🔬 Standalone Endpoints"]
+        direction TB
+        M14["M14\nWhat-If Simulation\nScenario Comparison"]
+        M15["M15\nPrediction Feedback\nIoU & Centroid Error"]
+    end
+
+    %% Input
+    SAR --> M1
+
+    %% Phase 1 internal
+    M1 -->|features| M2
+    M1 -->|features| M3
+    M1 -->|raw scene| M5
+    M2 -->|spill mask| M3
+    M3 -->|fused confidence| M4
+
+    %% Phase 1 to Phase 2
+    M5 -->|ship positions| M6
+    M2 -->|spill polygon| M7
+    M2 -->|spill polygon| M9
+
+    %% Phase 2 internal
+    M6 -->|AIS anomalies| M8
+    M7 -->|origin zones| M8
+    M9 -->|drift horizons| M10
+
+    %% Phase 2 to Phase 3
+    M10 -->|uncertainty bounds| M11
+
+    %% Phase 3 internal
+    M11 -->|asset impacts| M12
+    M11 -->|asset impacts| M13
+    M2  -->|detection data| M16
+    M8  -->|attribution data| M16
+    M9  -->|forecast data| M16
+    M10 -->|uncertainty data| M16
+    M12 -->|priority score| M16
+    M13 -->|allocation plan| M16
+    M16 -->|evidence graph| M17
+
+    %% Standalone connections
+    M13 -.->|scenario input| M14
+    M9  -.->|forecast to compare| M15
+
+    %% Styles
+    classDef observed  fill:#1a4a6b,stroke:#4ca3d4,color:#e8f4fd
+    classDef inferred  fill:#1a4d2e,stroke:#4caf7d,color:#e8fdf0
+    classDef simulated fill:#4a2a00,stroke:#d4882a,color:#fdf3e8
+    classDef standalone fill:#3a1a4a,stroke:#a05ac8,color:#f5e8fd
+    classDef input     fill:#1a1a3a,stroke:#6a6ad4,color:#e8e8fd
+
+    class SAR input
+    class M1,M2,M3,M4,M5 observed
+    class M6,M7,M8 inferred
+    class M9,M10,M11,M12,M13,M16,M17 simulated
+    class M14,M15 standalone
 ```
 
 **Key design decisions:**
