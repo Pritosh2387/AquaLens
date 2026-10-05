@@ -1,7 +1,6 @@
 import numpy as np
 from typing import Dict, Any
 
-
 def compile_confidence_feature_vector(
     model_probability: float,
     module1_features: Dict[str, Any],
