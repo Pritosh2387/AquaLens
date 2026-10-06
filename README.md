@@ -449,7 +449,7 @@ AquaLens/                           # Monorepo root
 ## 6. Docker
 
 > [!NOTE]
-> The Docker files are **placeholder / dummy** configurations. The project currently runs in development mode only. These are not production-ready and require proper secrets management, volume configuration, and domain setup before any deployment.
+> The project currently runs in development mode only. These are not production-ready and require proper secrets management, volume configuration, and domain setup before any deployment.
 
 Three files are provided as a starting point:
 
