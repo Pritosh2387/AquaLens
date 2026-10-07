@@ -6,7 +6,6 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-6.0+-3178C6?logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-8+-646CFF?logo=vite&logoColor=white)
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C?logo=pytorch&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-243%20passed-brightgreen)
 ![Mode](https://img.shields.io/badge/data-MOCK%20only-orange)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
